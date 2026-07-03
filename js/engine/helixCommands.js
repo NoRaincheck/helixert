@@ -519,7 +519,7 @@ class HelixCommands {
                 if (!grid.isWalkable(x + 1, y)) break;
                 x++;
             }
-            if (x < grid.width - 1) x++;
+            if (x < grid.width - 1 && grid.getTile(x + 1, y) === TileType.EMPTY) x++;
         } else {
             while (x < grid.width - 1) {
                 const nextTile = grid.getTile(x + 1, y);
@@ -529,7 +529,7 @@ class HelixCommands {
                 if (!grid.isWalkable(x + 1, y)) break;
                 x++;
             }
-            if (x < grid.width - 1) x++;
+            if (x < grid.width - 1 && grid.getTile(x + 1, y) === TileType.EMPTY) x++;
         }
 
         return { x, y };
@@ -548,7 +548,7 @@ class HelixCommands {
                 if (!grid.isWalkable(x - 1, y)) break;
                 x--;
             }
-            if (x > 0) x--;
+            if (x > 0 && grid.getTile(x - 1, y) === TileType.EMPTY) x--;
         } else {
             while (x > 0) {
                 const prevTile = grid.getTile(x - 1, y);
@@ -558,7 +558,7 @@ class HelixCommands {
                 if (!grid.isWalkable(x - 1, y)) break;
                 x--;
             }
-            if (x > 0) x--;
+            if (x > 0 && grid.getTile(x - 1, y) === TileType.EMPTY) x--;
         }
 
         return { x, y };
