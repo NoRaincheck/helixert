@@ -86,7 +86,7 @@ class GameScene extends Phaser.Scene {
                         spriteKey = 'star';
                         break;
                     case TileType.SWITCH:
-                        spriteKey = 'lollipop';
+                        spriteKey = 'lemon';
                         break;
                     case TileType.CHOCOLATE:
                         spriteKey = 'chocolate';
@@ -186,7 +186,7 @@ class GameScene extends Phaser.Scene {
             case TileType.DOOR: spriteKey = 'door'; break;
             case TileType.BONUS: spriteKey = 'star'; break;
             case TileType.COLLECTED: spriteKey = 'star'; break;
-            case TileType.SWITCH: spriteKey = 'lollipop'; break;
+            case TileType.SWITCH: spriteKey = 'lemon'; break;
             case TileType.CHOCOLATE: spriteKey = 'chocolate'; break;
         }
 

@@ -36,7 +36,7 @@ class BootScene extends Phaser.Scene {
             { key: 'ground', file: 'assets/sprites/ground.png' },
             { key: 'cake', file: 'assets/sprites/cake.png' },
             { key: 'chocolate', file: 'assets/sprites/chocolate.png' },
-            { key: 'lollipop', file: 'assets/sprites/lollipop.png' },
+            { key: 'lemon', file: 'assets/sprites/lemon.png' },
         ];
 
         sprites.forEach(s => this.load.image(s.key, s.file));
