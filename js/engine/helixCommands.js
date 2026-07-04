@@ -260,15 +260,14 @@ class HelixCommands {
                     return { moved: false };
                 }
                 case 'e': {
-                    for (let y = grid.height - 1; y >= 0; y--) {
-                        const x = grid.getLastNonWallInRow(y, 1);
-                        if (x >= 0) {
-                            grid.playerPos.x = x;
-                            grid.playerPos.y = y;
-                            const collected = grid.collectTarget(x, y);
-                            this.lastCommand = { type: 'goto', target: 'end' };
-                            return { moved: true, collected, newX: x, newY: y };
-                        }
+                    const y = grid.height - 1;
+                    const x = grid.getFirstNonWallInRow(y, 1);
+                    if (x >= 0) {
+                        grid.playerPos.x = x;
+                        grid.playerPos.y = y;
+                        const collected = grid.collectTarget(x, y);
+                        this.lastCommand = { type: 'goto', target: 'end' };
+                        return { moved: true, collected, newX: x, newY: y };
                     }
                     return { moved: false };
                 }
@@ -509,34 +508,32 @@ class HelixCommands {
     moveWordForward(grid, startX, startY, wordType) {
         let x = startX;
         let y = startY;
+        const tile = grid.getTile(x, y);
 
-        // Skip non-word characters on current line
-        while (x < grid.width - 1) {
-            const next = grid.getTile(x + 1, y);
-            if (this.isNonWordTile(next)) {
+        // Phase 1: skip past current word (same-type run)
+        let endOfRunX = x;
+        const wasOnWord = !this.isNonWordTile(tile);
+        if (!this.isNonWordTile(tile)) {
+            while (x < grid.width - 1 && grid.getTile(x + 1, y) === tile) {
                 x++;
-            } else {
-                break;
+                endOfRunX = x;
             }
         }
 
-        // If we found a word character ahead, move to it
-        if (x < grid.width - 1) {
-            const next = grid.getTile(x + 1, y);
-            if (!this.isNonWordTile(next)) {
-                if (wordType === 2) {
-                    return this.skipToEndOfRun(grid, x + 1, y);
-                }
-                // For #, treat the entire run as one word
-                if (next === TileType.WALL) {
-                    return this.skipToEndOfRun(grid, x + 1, y);
-                }
-                return { x: x + 1, y };
-            }
+        // Phase 2: skip separators
+        while (x < grid.width - 1 && this.isNonWordTile(grid.getTile(x + 1, y))) {
+            x++;
         }
 
-        // At end of line - wrap to next line and find first word
-        return this.findFirstWordForward(grid, x, y, wordType);
+        // Phase 3: land on start of next word
+        if (x < grid.width - 1 && !this.isNonWordTile(grid.getTile(x + 1, y))) {
+            if (wordType === 2) {
+                return this.skipToEndOfRun(grid, x + 1, y);
+            }
+            return { x: x + 1, y };
+        }
+
+        return this.findFirstWordForward(grid, x, y, wordType, endOfRunX, wasOnWord);
     }
 
     skipToEndOfRun(grid, startX, y) {
@@ -555,7 +552,7 @@ class HelixCommands {
         return { x, y };
     }
 
-    findFirstWordForward(grid, startX, startY, wordType) {
+    findFirstWordForward(grid, startX, startY, wordType, endOfRunX, wasOnWord) {
         let y = startY + 1;
 
         while (y < grid.height) {
@@ -578,7 +575,10 @@ class HelixCommands {
             y++;
         }
 
-        // No word found - return last valid position
+        // No word found - return end of current word run, or last position if started on separator
+        if (wasOnWord && endOfRunX !== undefined) {
+            return { x: endOfRunX, y: startY };
+        }
         return { x: startX, y: startY };
     }
 
@@ -590,33 +590,26 @@ class HelixCommands {
     moveWordBackward(grid, startX, startY, wordType) {
         let x = startX;
         let y = startY;
+        const tile = grid.getTile(x, y);
 
-        // Skip non-word characters on current line
-        while (x > 0) {
-            const prev = grid.getTile(x - 1, y);
-            if (this.isNonWordTile(prev)) {
+        // Phase 1: skip backward past current word (same-type run)
+        if (!this.isNonWordTile(tile)) {
+            while (x > 0 && grid.getTile(x - 1, y) === tile) {
                 x--;
-            } else {
-                break;
             }
         }
 
-        // If we found a word character behind, move to it
-        if (x > 0) {
-            const prev = grid.getTile(x - 1, y);
-            if (!this.isNonWordTile(prev)) {
-                if (wordType === 2) {
-                    return this.skipToStartOfRun(grid, x - 1, y);
-                }
-                // For #, treat the entire run as one word
-                if (prev === TileType.WALL) {
-                    return this.skipToStartOfRun(grid, x - 1, y);
-                }
-                return { x: x - 1, y };
-            }
+        // Phase 2: skip non-word characters backward
+        while (x > 0 && this.isNonWordTile(grid.getTile(x - 1, y))) {
+            x--;
         }
 
-        // At start of line - wrap to previous line and find last word
+        // Phase 3: land on start of previous word
+        if (x > 0 && !this.isNonWordTile(grid.getTile(x - 1, y))) {
+            return this.skipToStartOfRun(grid, x - 1, y);
+        }
+
+        // Wrap: find last word on previous line
         return this.findLastWordBackward(grid, x, y, wordType);
     }
 
@@ -666,38 +659,51 @@ class HelixCommands {
     moveWordEnd(grid, startX, startY, wordType) {
         let x = startX;
         let y = startY;
+        const tile = grid.getTile(x, y);
 
-        if (wordType === 1) {
-            if (x < grid.width - 1) {
-                const nextTile = grid.getTile(x + 1, y);
-                if (nextTile !== TileType.WALL && nextTile !== TileType.TARGET && nextTile !== TileType.BONUS && grid.isWalkable(x + 1, y)) {
-                    x++;
-                    while (x < grid.width - 1) {
-                        const tile = grid.getTile(x + 1, y);
-                        if (tile === TileType.WALL || tile === TileType.TARGET || tile === TileType.BONUS || !grid.isWalkable(x + 1, y)) {
-                            break;
-                        }
-                        x++;
-                    }
-                }
+        // Phase 1: move within current word (same-type run) to its end
+        let endOfRunX = x;
+        const wasOnWord = !this.isNonWordTile(tile);
+        if (!this.isNonWordTile(tile)) {
+            const oldX = x;
+            while (x < grid.width - 1 && grid.getTile(x + 1, y) === tile) {
+                x++;
+                endOfRunX = x;
             }
-        } else {
-            if (x < grid.width - 1) {
-                const nextTile = grid.getTile(x + 1, y);
-                if (nextTile !== TileType.WALL && nextTile !== TileType.TARGET && nextTile !== TileType.BONUS && grid.isWalkable(x + 1, y)) {
-                    x++;
-                    while (x < grid.width - 1) {
-                        const tile = grid.getTile(x + 1, y);
-                        if (tile === TileType.WALL || tile === TileType.TARGET || tile === TileType.BONUS || !grid.isWalkable(x + 1, y)) {
-                            break;
-                        }
-                        x++;
-                    }
-                }
+            // If we advanced within the run, we're at the end — return
+            if (x > oldX) {
+                return { x, y };
             }
+            // We were already at the end — continue to Phase 2 to find next word
         }
 
-        return { x, y };
+        // Phase 2: skip separators
+        while (x < grid.width - 1 && this.isNonWordTile(grid.getTile(x + 1, y))) {
+            x++;
+        }
+
+        // Phase 3: land on end of next word
+        if (x < grid.width - 1 && !this.isNonWordTile(grid.getTile(x + 1, y))) {
+            x++;
+            const nextTile = grid.getTile(x, y);
+            while (x < grid.width - 1 && grid.getTile(x + 1, y) === nextTile) {
+                x++;
+            }
+            return { x, y };
+        }
+
+        // Wrap: find first word on next line, then scan to its end
+        const result = this.findFirstWordForward(grid, x, y, wordType, endOfRunX, wasOnWord);
+        if (result.x !== startX || result.y !== startY) {
+            let ex = result.x;
+            const wt = grid.getTile(ex, result.y);
+            while (ex < grid.width - 1 && grid.getTile(ex + 1, result.y) === wt) {
+                ex++;
+            }
+            return { x: ex, y: result.y };
+        }
+
+        return { x: endOfRunX, y: startY };
     }
 
     repeatLast(grid) {

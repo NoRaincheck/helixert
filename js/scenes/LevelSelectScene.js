@@ -206,7 +206,7 @@ class LevelSelectScene extends Phaser.Scene {
             unlockBtn.on('pointerover', () => unlockBtn.setColor('#ffd93d'));
             unlockBtn.on('pointerout', () => unlockBtn.setColor('#555577'));
             unlockBtn.on('pointerdown', () => {
-                GameState.data.unlockedWorlds = [1, 2, 3, 4, 5];
+                GameState.data.unlockedWorlds = [1, 2, 3, 4, 5, 6];
                 GameState.save();
                 this.scene.restart();
             });

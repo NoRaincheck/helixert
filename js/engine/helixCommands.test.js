@@ -43,40 +43,69 @@ class Grid {
         }
         return true;
     }
+
+    getFirstNonWallInRow(y, direction) {
+        if (direction > 0) {
+            for (let x = 0; x < this.width; x++) {
+                if (this.tiles[y][x] !== TileType.WALL) return x;
+            }
+        } else {
+            for (let x = this.width - 1; x >= 0; x--) {
+                if (this.tiles[y][x] !== TileType.WALL) return x;
+            }
+        }
+        return -1;
+    }
+
+    getLastNonWallInRow(y, direction) {
+        if (direction > 0) {
+            for (let x = this.width - 1; x >= 0; x--) {
+                if (this.tiles[y][x] !== TileType.WALL) return x;
+            }
+        } else {
+            for (let x = 0; x < this.width; x++) {
+                if (this.tiles[y][x] !== TileType.WALL) return x;
+            }
+        }
+        return -1;
+    }
+
+    collectTarget(x, y) {
+        return false;
+    }
+
+    isFloorMark(x, y) {
+        return this.getTile(x, y) === TileType.FLOOR_MARK;
+    }
 }
 
 class HelixCommands {
     moveWordForward(grid, startX, startY, wordType) {
         let x = startX;
         let y = startY;
+        const tile = grid.getTile(x, y);
 
-        // Skip non-word characters on current line
-        while (x < grid.width - 1) {
-            const next = grid.getTile(x + 1, y);
-            if (this.isNonWordTile(next)) {
+        let endOfRunX = x;
+        const wasOnWord = !this.isNonWordTile(tile);
+        if (!this.isNonWordTile(tile)) {
+            while (x < grid.width - 1 && grid.getTile(x + 1, y) === tile) {
                 x++;
-            } else {
-                break;
+                endOfRunX = x;
             }
         }
 
-        // If we found a word character ahead, move to it
-        if (x < grid.width - 1) {
-            const next = grid.getTile(x + 1, y);
-            if (!this.isNonWordTile(next)) {
-                if (wordType === 2) {
-                    return this.skipToEndOfRun(grid, x + 1, y);
-                }
-                // For #, treat the entire run as one word
-                if (next === TileType.WALL) {
-                    return this.skipToEndOfRun(grid, x + 1, y);
-                }
-                return { x: x + 1, y };
-            }
+        while (x < grid.width - 1 && this.isNonWordTile(grid.getTile(x + 1, y))) {
+            x++;
         }
 
-        // At end of line - wrap to next line and find first word
-        return this.findFirstWordForward(grid, x, y, wordType);
+        if (x < grid.width - 1 && !this.isNonWordTile(grid.getTile(x + 1, y))) {
+            if (wordType === 2) {
+                return this.skipToEndOfRun(grid, x + 1, y);
+            }
+            return { x: x + 1, y };
+        }
+
+        return this.findFirstWordForward(grid, x, y, wordType, endOfRunX, wasOnWord);
     }
 
     skipToEndOfRun(grid, startX, y) {
@@ -95,20 +124,18 @@ class HelixCommands {
         return { x, y };
     }
 
-    findFirstWordForward(grid, startX, startY, wordType) {
+    findFirstWordForward(grid, startX, startY, wordType, endOfRunX, wasOnWord) {
         let y = startY + 1;
 
         while (y < grid.height) {
             let x = 0;
 
-            // Skip leading non-word characters
             while (x < grid.width) {
                 const tile = grid.getTile(x, y);
                 if (this.isNonWordTile(tile)) {
                     x++;
                 } else {
-                    // Found a word character
-                    if (wordType === 2 || tile === TileType.WALL) {
+                    if (wordType === 2) {
                         return this.skipToEndOfRun(grid, x, y);
                     }
                     return { x, y };
@@ -118,40 +145,36 @@ class HelixCommands {
             y++;
         }
 
-        // No word found - return last valid position
+        // No word found - return end of current word run, or last position if started on separator
+        if (wasOnWord && endOfRunX !== undefined) {
+            return { x: endOfRunX, y: startY };
+        }
         return { x: startX, y: startY };
     }
 
     moveWordBackward(grid, startX, startY, wordType) {
         let x = startX;
         let y = startY;
+        const tile = grid.getTile(x, y);
 
-        // Skip non-word characters on current line
-        while (x > 0) {
-            const prev = grid.getTile(x - 1, y);
-            if (this.isNonWordTile(prev)) {
+        // Phase 1: skip backward past current word (same-type run)
+        if (!this.isNonWordTile(tile)) {
+            while (x > 0 && grid.getTile(x - 1, y) === tile) {
                 x--;
-            } else {
-                break;
             }
         }
 
-        // If we found a word character behind, move to it
-        if (x > 0) {
-            const prev = grid.getTile(x - 1, y);
-            if (!this.isNonWordTile(prev)) {
-                if (wordType === 2) {
-                    return this.skipToStartOfRun(grid, x - 1, y);
-                }
-                // For #, treat the entire run as one word
-                if (prev === TileType.WALL) {
-                    return this.skipToStartOfRun(grid, x - 1, y);
-                }
-                return { x: x - 1, y };
-            }
+        // Phase 2: skip non-word characters backward
+        while (x > 0 && this.isNonWordTile(grid.getTile(x - 1, y))) {
+            x--;
         }
 
-        // At start of line - wrap to previous line and find last word
+        // Phase 3: land on start of previous word
+        if (x > 0 && !this.isNonWordTile(grid.getTile(x - 1, y))) {
+            return this.skipToStartOfRun(grid, x - 1, y);
+        }
+
+        // Wrap: find last word on previous line
         return this.findLastWordBackward(grid, x, y, wordType);
     }
 
@@ -177,14 +200,12 @@ class HelixCommands {
         while (y >= 0) {
             let x = grid.width - 1;
 
-            // Skip trailing non-word characters
             while (x >= 0) {
                 const tile = grid.getTile(x, y);
                 if (this.isNonWordTile(tile)) {
                     x--;
                 } else {
-                    // Found a word character
-                    if (wordType === 2 || tile === TileType.WALL) {
+                    if (wordType === 2) {
                         return this.skipToStartOfRun(grid, x, y);
                     }
                     return { x, y };
@@ -194,13 +215,100 @@ class HelixCommands {
             y--;
         }
 
-        // No word found - return last valid position
         return { x: startX, y: startY };
     }
 
     isNonWordTile(tile) {
         return tile === TileType.EMPTY || tile === TileType.START ||
                tile === TileType.FLOOR_MARK;
+    }
+
+    moveWordEnd(grid, startX, startY, wordType) {
+        let x = startX;
+        let y = startY;
+        const tile = grid.getTile(x, y);
+
+        let endOfRunX = x;
+        const wasOnWord = !this.isNonWordTile(tile);
+        if (!this.isNonWordTile(tile)) {
+            const oldX = x;
+            while (x < grid.width - 1 && grid.getTile(x + 1, y) === tile) {
+                x++;
+                endOfRunX = x;
+            }
+            // If we advanced within the run, we're at the end — return
+            if (x > oldX) {
+                return { x, y };
+            }
+            // We were already at the end — continue to Phase 2 to find next word
+        }
+
+        while (x < grid.width - 1 && this.isNonWordTile(grid.getTile(x + 1, y))) {
+            x++;
+        }
+
+        if (x < grid.width - 1 && !this.isNonWordTile(grid.getTile(x + 1, y))) {
+            x++;
+            const nextTile = grid.getTile(x, y);
+            while (x < grid.width - 1 && grid.getTile(x + 1, y) === nextTile) {
+                x++;
+            }
+            return { x, y };
+        }
+
+        const result = this.findFirstWordForward(grid, x, y, wordType, endOfRunX, wasOnWord);
+        if (result.x !== startX || result.y !== startY) {
+            let ex = result.x;
+            const wt = grid.getTile(ex, result.y);
+            while (ex < grid.width - 1 && grid.getTile(ex + 1, result.y) === wt) {
+                ex++;
+            }
+            return { x: ex, y: result.y };
+        }
+
+        return { x: endOfRunX, y: startY };
+    }
+
+    gotoStart(grid) {
+        const y = 0;
+        const x = grid.getFirstNonWallInRow(y, 1);
+        if (x >= 0) {
+            grid.playerPos.x = x;
+            grid.playerPos.y = y;
+            return { x, y };
+        }
+        return null;
+    }
+
+    gotoEnd(grid) {
+        const y = grid.height - 1;
+        const x = grid.getFirstNonWallInRow(y, 1);
+        if (x >= 0) {
+            grid.playerPos.x = x;
+            grid.playerPos.y = y;
+            return { x, y };
+        }
+        return null;
+    }
+
+    gotoLineStart(grid) {
+        const pos = grid.playerPos;
+        const x = grid.getFirstNonWallInRow(pos.y, 1);
+        if (x >= 0) {
+            grid.playerPos.x = x;
+            return { x, y: pos.y };
+        }
+        return null;
+    }
+
+    gotoLineEnd(grid) {
+        const pos = grid.playerPos;
+        const x = grid.getLastNonWallInRow(pos.y, 1);
+        if (x >= 0) {
+            grid.playerPos.x = x;
+            return { x, y: pos.y };
+        }
+        return null;
     }
 }
 
@@ -252,11 +360,190 @@ function B(grid, x, y = 0) {
     return cmd.moveWordBackward(grid, x, y, 2);
 }
 
-// --- Tests: `w` motion ---
+function e(grid, x = 0, y = 0) {
+    return cmd.moveWordEnd(grid, x, y, 1);
+}
 
-Deno.test("w skips whitespace and lands on first word tile", () => {
-    const g = makeGrid("...T...");
+// --- Tests: `w` motion (same-type-run model) ---
+
+Deno.test("w: from # skips to first X in #...XT...XXT...XT", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(w(g, 0), { x: 4, y: 0 });
+});
+
+Deno.test("w: from X skips to T (same-type boundary)", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(w(g, 4), { x: 5, y: 0 });
+});
+
+Deno.test("w: from T skips dots then lands on X", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(w(g, 5), { x: 9, y: 0 });
+});
+
+Deno.test("w: from first X of XX skips to T", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(w(g, 9), { x: 11, y: 0 });
+});
+
+Deno.test("w: from XX lands on T", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(w(g, 10), { x: 11, y: 0 });
+});
+
+Deno.test("w: from T after XX skips to X", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(w(g, 11), { x: 15, y: 0 });
+});
+
+Deno.test("w: from X at end skips to T", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(w(g, 15), { x: 16, y: 0 });
+});
+
+Deno.test("w: from T at end of single line stays", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(w(g, 16), { x: 16, y: 0 });
+});
+
+Deno.test("w: on separator skips to next word", () => {
+    const g = makeGrid("...T..");
     assertEquals(w(g, 0), { x: 3, y: 0 });
+});
+
+Deno.test("w: adjacent same-type chars move as one word", () => {
+    const g = makeGrid("XXTT..");
+    assertEquals(w(g, 0), { x: 2, y: 0 });
+});
+
+Deno.test("w: TT run then XX run", () => {
+    const g = makeGrid("TT..XX");
+    assertEquals(w(g, 0), { x: 4, y: 0 });
+});
+
+// --- Tests: `e` motion (end of next word) ---
+
+Deno.test("e: from # lands on end of X word", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(e(g, 0), { x: 4, y: 0 });
+});
+
+Deno.test("e: from X lands on T (end of T word)", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(e(g, 4), { x: 5, y: 0 });
+});
+
+Deno.test("e: from T skips to end of XX run", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(e(g, 5), { x: 10, y: 0 });
+});
+
+Deno.test("e: from first X of XX lands on last X", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(e(g, 9), { x: 10, y: 0 });
+});
+
+Deno.test("e: from XX lands on T", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(e(g, 10), { x: 11, y: 0 });
+});
+
+Deno.test("e: from T after XX lands on X (end of X word)", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(e(g, 11), { x: 15, y: 0 });
+});
+
+Deno.test("e: from second X lands on T", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(e(g, 15), { x: 16, y: 0 });
+});
+
+Deno.test("e: from T at end stays", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(e(g, 16), { x: 16, y: 0 });
+});
+
+Deno.test("e: adjacent XX then TT", () => {
+    const g = makeGrid("XXTT..");
+    assertEquals(e(g, 0), { x: 1, y: 0 });
+});
+
+// --- Tests: `b` motion (backward, same-type-run model) ---
+
+Deno.test("b: from T lands on start of X word", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(b(g, 5), { x: 4, y: 0 });
+});
+
+Deno.test("b: from X after dots lands on T", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(b(g, 9), { x: 5, y: 0 });
+});
+
+Deno.test("b: from last T lands on XX", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(b(g, 11), { x: 9, y: 0 });
+});
+
+Deno.test("b: from X at end lands on T", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(b(g, 16), { x: 15, y: 0 });
+});
+
+Deno.test("b: from first X lands on T before dots", () => {
+    const g = makeGrid("#...XT...XXT...XT");
+    assertEquals(b(g, 4), { x: 0, y: 0 });
+});
+
+// --- Tests: `w` multi-line wrapping (same-type-run model) ---
+
+Deno.test("w wraps to next line", () => {
+    const g = makeMultiLineGrid(["T.", "T."]);
+    assertEquals(w(g, 0, 0), { x: 0, y: 1 });
+});
+
+Deno.test("w wraps skipping separator line", () => {
+    const g = makeMultiLineGrid(["T.", "...", "T."]);
+    assertEquals(w(g, 0, 0), { x: 0, y: 2 });
+});
+
+Deno.test("w wraps to different type on next line", () => {
+    const g = makeMultiLineGrid(["X.", "T."]);
+    assertEquals(w(g, 0, 0), { x: 0, y: 1 });
+});
+
+Deno.test("w at end of last line stays", () => {
+    const g = makeMultiLineGrid(["T.", "T."]);
+    assertEquals(w(g, 0, 1), { x: 0, y: 1 });
+});
+
+// --- Tests: `W` WORD motion (uppercase = skip to end of run) ---
+
+Deno.test("W: from X skips to end of TT run", () => {
+    const g = makeGrid("XTT..XX");
+    assertEquals(W(g, 0), { x: 2, y: 0 });
+});
+
+Deno.test("W: from XX skips to end of TT", () => {
+    const g = makeGrid("..XXTT..");
+    assertEquals(W(g, 2), { x: 5, y: 0 });
+});
+
+Deno.test("W wraps to end of run on next line", () => {
+    const g = makeMultiLineGrid(["X.", "TT"]);
+    assertEquals(W(g, 0, 0), { x: 1, y: 1 });
+});
+
+// --- Tests: `B` WORD motion (uppercase backward) ---
+
+Deno.test("B: from TT skips to start of XX", () => {
+    const g = makeGrid("XX..TT");
+    assertEquals(B(g, 5), { x: 0, y: 0 });
+});
+
+Deno.test("B wraps to start of run on previous line", () => {
+    const g = makeMultiLineGrid(["XX", "T."]);
+    assertEquals(B(g, 0, 1), { x: 0, y: 0 });
 });
 
 Deno.test("w skips consecutive EMPTY tiles", () => {
@@ -338,7 +625,7 @@ Deno.test("b skips whitespace backward and lands on word tile", () => {
 
 Deno.test("b lands on WALL as a word token backward", () => {
     const g = makeGrid("T##T...");
-    assertEquals(b(g, 3), { x: 2, y: 0 });
+    assertEquals(b(g, 3), { x: 1, y: 0 });
 });
 
 Deno.test("b lands on first WALL backward in mixed", () => {
@@ -358,12 +645,12 @@ Deno.test("b from word tile skips trailing whitespace to previous word", () => {
 
 Deno.test("b lands on WALL backward to reach word", () => {
     const g = makeGrid("T##T...");
-    assertEquals(b(g, 3), { x: 2, y: 0 });
+    assertEquals(b(g, 3), { x: 1, y: 0 });
 });
 
 Deno.test("b from wall run lands on WALL token", () => {
     const g = makeGrid("T.###");
-    assertEquals(b(g, 4), { x: 3, y: 0 });
+    assertEquals(b(g, 4), { x: 0, y: 0 });
 });
 
 // --- Helix-like behavior edge cases ---
@@ -384,7 +671,7 @@ Deno.test("w with alternating . and # lands on first #", () => {
 Deno.test("b treats # and . differently - # is a token", () => {
     const g1 = makeGrid("T...T");
     const g2 = makeGrid("T###T");
-    assertEquals(b(g2, 4), { x: 3, y: 0 });
+    assertEquals(b(g2, 4), { x: 1, y: 0 });
 });
 
 Deno.test("w handles single-char line", () => {
@@ -394,7 +681,7 @@ Deno.test("w handles single-char line", () => {
 
 Deno.test("w on all-wall line lands on first WALL", () => {
     const g = makeGrid("####");
-    assertEquals(w(g, 0), { x: 1, y: 0 });
+    assertEquals(w(g, 0), { x: 3, y: 0 });
 });
 
 Deno.test("w on empty line stops at last dot", () => {
@@ -540,7 +827,7 @@ Deno.test("W skips whitespace then to end of wall run", () => {
 
 Deno.test("W from wall run skips to end of next run", () => {
     const g = makeGrid("##..##");
-    assertEquals(W(g, 0), { x: 1, y: 0 });
+    assertEquals(W(g, 0), { x: 5, y: 0 });
 });
 
 Deno.test("W at end of wall run skips to end of next word", () => {
@@ -587,7 +874,7 @@ Deno.test("B skips whitespace then to start of wall run", () => {
 
 Deno.test("B from wall run skips to start of previous run", () => {
     const g = makeGrid("##..##");
-    assertEquals(B(g, 5), { x: 4, y: 0 });
+    assertEquals(B(g, 5), { x: 0, y: 0 });
 });
 
 Deno.test("B at start of wall run skips to start of previous word", () => {
@@ -603,4 +890,145 @@ Deno.test("B wraps to start of run on previous line", () => {
 Deno.test("B wraps skipping empty lines to wall run", () => {
     const g = makeMultiLineGrid(["##T", "...", "T."]);
     assertEquals(B(g, 0, 2), { x: 2, y: 0 });
+});
+
+// --- Tests: `gg` (goto start) ---
+
+Deno.test("gg jumps to first non-wall in top row", () => {
+    const g = makeMultiLineGrid(["###T.", "#...#", "...T#"]);
+    g.playerPos = { x: 3, y: 2 };
+    const result = cmd.gotoStart(g);
+    assertEquals(result, { x: 3, y: 0 });
+});
+
+Deno.test("gg from bottom lands on top row", () => {
+    const g = makeMultiLineGrid(["T..", "...", "..S"]);
+    g.playerPos = { x: 2, y: 2 };
+    const result = cmd.gotoStart(g);
+    assertEquals(result, { x: 0, y: 0 });
+});
+
+Deno.test("gg when top row is all walls returns null", () => {
+    const g = makeMultiLineGrid(["####", "T...", "...T"]);
+    g.playerPos = { x: 0, y: 2 };
+    const result = cmd.gotoStart(g);
+    assertEquals(result, null);
+});
+
+Deno.test("gg updates player position", () => {
+    const g = makeMultiLineGrid(["..T#", "#...", "...."]);
+    g.playerPos = { x: 1, y: 2 };
+    cmd.gotoStart(g);
+    assertEquals(g.playerPos, { x: 0, y: 0 });
+});
+
+// --- Tests: `ge` (goto end — beginning of final line) ---
+
+Deno.test("ge jumps to first non-wall in last row", () => {
+    const g = makeMultiLineGrid(["T...", "#...", "..T#"]);
+    g.playerPos = { x: 0, y: 0 };
+    const result = cmd.gotoEnd(g);
+    assertEquals(result, { x: 0, y: 2 });
+});
+
+Deno.test("ge from top lands on last row", () => {
+    const g = makeMultiLineGrid(["S..", "...", "#.T"]);
+    g.playerPos = { x: 0, y: 0 };
+    const result = cmd.gotoEnd(g);
+    assertEquals(result, { x: 1, y: 2 });
+});
+
+Deno.test("ge when last row is all walls returns null", () => {
+    const g = makeMultiLineGrid(["T...", "...T", "####"]);
+    g.playerPos = { x: 0, y: 0 };
+    const result = cmd.gotoEnd(g);
+    assertEquals(result, null);
+});
+
+Deno.test("ge updates player position", () => {
+    const g = makeMultiLineGrid(["T...", "...", "##T."]);
+    g.playerPos = { x: 0, y: 0 };
+    cmd.gotoEnd(g);
+    assertEquals(g.playerPos, { x: 2, y: 2 });
+});
+
+Deno.test("ge on single line goes to first non-wall of that line", () => {
+    const g = makeGrid("#T..");
+    g.playerPos = { x: 2, y: 0 };
+    const result = cmd.gotoEnd(g);
+    assertEquals(result, { x: 1, y: 0 });
+});
+
+// --- Tests: `gh` (goto line start) ---
+
+Deno.test("gh jumps to first non-wall in current row", () => {
+    const g = makeMultiLineGrid(["####", "#.T.", "#..#"]);
+    g.playerPos = { x: 3, y: 1 };
+    const result = cmd.gotoLineStart(g);
+    assertEquals(result, { x: 1, y: 1 });
+});
+
+Deno.test("gh from middle of row goes to start", () => {
+    const g = makeGrid("..T..");
+    g.playerPos = { x: 3, y: 0 };
+    const result = cmd.gotoLineStart(g);
+    assertEquals(result, { x: 0, y: 0 });
+});
+
+Deno.test("gh when row is all walls returns null", () => {
+    const g = makeMultiLineGrid(["####", "####", "####"]);
+    g.playerPos = { x: 2, y: 1 };
+    const result = cmd.gotoLineStart(g);
+    assertEquals(result, null);
+});
+
+Deno.test("gh updates player x but not y", () => {
+    const g = makeMultiLineGrid(["T...", "#..T", "...T"]);
+    g.playerPos = { x: 3, y: 1 };
+    cmd.gotoLineStart(g);
+    assertEquals(g.playerPos, { x: 1, y: 1 });
+});
+
+Deno.test("gh on top row goes to first non-wall", () => {
+    const g = makeGrid("#.T..");
+    g.playerPos = { x: 4, y: 0 };
+    const result = cmd.gotoLineStart(g);
+    assertEquals(result, { x: 1, y: 0 });
+});
+
+// --- Tests: `gl` (goto line end) ---
+
+Deno.test("gl jumps to last non-wall in current row", () => {
+    const g = makeMultiLineGrid(["####", "#.T#", "#..#"]);
+    g.playerPos = { x: 1, y: 1 };
+    const result = cmd.gotoLineEnd(g);
+    assertEquals(result, { x: 2, y: 1 });
+});
+
+Deno.test("gl from start of row goes to end", () => {
+    const g = makeGrid("..T..");
+    g.playerPos = { x: 0, y: 0 };
+    const result = cmd.gotoLineEnd(g);
+    assertEquals(result, { x: 4, y: 0 });
+});
+
+Deno.test("gl when row is all walls returns null", () => {
+    const g = makeMultiLineGrid(["####", "####", "####"]);
+    g.playerPos = { x: 2, y: 1 };
+    const result = cmd.gotoLineEnd(g);
+    assertEquals(result, null);
+});
+
+Deno.test("gl updates player x but not y", () => {
+    const g = makeMultiLineGrid(["T...", ".#..", "...T"]);
+    g.playerPos = { x: 0, y: 1 };
+    cmd.gotoLineEnd(g);
+    assertEquals(g.playerPos, { x: 3, y: 1 });
+});
+
+Deno.test("gl on bottom row goes to last non-wall", () => {
+    const g = makeGrid("..T.#");
+    g.playerPos = { x: 2, y: 0 };
+    const result = cmd.gotoLineEnd(g);
+    assertEquals(result, { x: 3, y: 0 });
 });
