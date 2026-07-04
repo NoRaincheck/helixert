@@ -321,6 +321,19 @@ class GameScene extends Phaser.Scene {
         resetBtn.on('pointerdown', () => {
             this.scene.restart({ levelId: this.levelId, worldNum: this.worldNum });
         });
+
+        const backBtn = this.add.text(width - 15, height - 30, '[ World Map ]', {
+            fontSize: '12px',
+            fontFamily: 'Courier New, monospace',
+            color: '#666688',
+            padding: { x: 8, y: 3 }
+        }).setOrigin(1, 0).setInteractive({ useHandCursor: true }).setDepth(10);
+
+        backBtn.on('pointerover', () => backBtn.setColor('#4ecdc4'));
+        backBtn.on('pointerout', () => backBtn.setColor('#666688'));
+        backBtn.on('pointerdown', () => {
+            this.scene.start('LevelSelectScene');
+        });
     }
 
     updateHUD() {
