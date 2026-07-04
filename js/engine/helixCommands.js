@@ -510,34 +510,105 @@ class HelixCommands {
         let x = startX;
         let y = startY;
 
-        while (x < grid.width) {
-            const nextTile = grid.getTile(x + 1, y);
-            if (nextTile === TileType.WALL) break;
-            if (nextTile === TileType.EMPTY || nextTile === TileType.TARGET || nextTile === TileType.BONUS) {
+        // Skip non-word characters on current line
+        while (x < grid.width - 1) {
+            const next = grid.getTile(x + 1, y);
+            if (this.isNonWordTile(next)) {
                 x++;
             } else {
                 break;
             }
         }
 
-        return { x, y };
+        // If we found a word character ahead, move to it
+        if (x < grid.width - 1) {
+            const next = grid.getTile(x + 1, y);
+            if (!this.isNonWordTile(next)) {
+                return { x: x + 1, y };
+            }
+        }
+
+        // At end of line - wrap to next line and find first word
+        return this.findFirstWordForward(grid, x, y);
+    }
+
+    findFirstWordForward(grid, startX, startY) {
+        let y = startY + 1;
+
+        while (y < grid.height) {
+            let x = 0;
+
+            // Skip leading non-word characters
+            while (x < grid.width) {
+                const tile = grid.getTile(x, y);
+                if (this.isNonWordTile(tile)) {
+                    x++;
+                } else {
+                    // Found a word character
+                    return { x, y };
+                }
+            }
+
+            y++;
+        }
+
+        // No word found - return last valid position
+        return { x: startX, y: startY };
+    }
+
+    isNonWordTile(tile) {
+        return tile === TileType.EMPTY || tile === TileType.START ||
+               tile === TileType.FLOOR_MARK || tile === TileType.WALL;
     }
 
     moveWordBackward(grid, startX, startY, wordType) {
         let x = startX;
         let y = startY;
 
+        // Skip non-word characters on current line
         while (x > 0) {
-            const prevTile = grid.getTile(x - 1, y);
-            if (prevTile === TileType.WALL) break;
-            if (prevTile === TileType.EMPTY || prevTile === TileType.TARGET || prevTile === TileType.BONUS) {
+            const prev = grid.getTile(x - 1, y);
+            if (this.isNonWordTile(prev)) {
                 x--;
             } else {
                 break;
             }
         }
 
-        return { x, y };
+        // If we found a word character behind, move to it
+        if (x > 0) {
+            const prev = grid.getTile(x - 1, y);
+            if (!this.isNonWordTile(prev)) {
+                return { x: x - 1, y };
+            }
+        }
+
+        // At start of line - wrap to previous line and find last word
+        return this.findLastWordBackward(grid, x, y);
+    }
+
+    findLastWordBackward(grid, startX, startY) {
+        let y = startY - 1;
+
+        while (y >= 0) {
+            let x = grid.width - 1;
+
+            // Skip trailing non-word characters
+            while (x >= 0) {
+                const tile = grid.getTile(x, y);
+                if (this.isNonWordTile(tile)) {
+                    x--;
+                } else {
+                    // Found a word character
+                    return { x, y };
+                }
+            }
+
+            y--;
+        }
+
+        // No word found - return last valid position
+        return { x: startX, y: startY };
     }
 
     moveWordEnd(grid, startX, startY, wordType) {

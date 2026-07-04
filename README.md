@@ -44,6 +44,14 @@ A browser-based game that teaches [Helix editor](https://helix-editor.com/) keyb
 - `g l` - Go to line end
 - `g f` - Go to floor mark
 
+## Testing
+
+Tests use [Deno](https://deno.land/) with its built-in test runner.
+
+```sh
+deno test --no-check js/engine/helixCommands.test.js
+```
+
 ## GitHub Pages Deployment
 
 1. Push this repository to GitHub
