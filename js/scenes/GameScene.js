@@ -140,12 +140,14 @@ class GameScene extends Phaser.Scene {
 
         if (animated) {
             this.isAnimating = true;
+            const dist = Math.abs(newX - this.grid.playerPos.x) + Math.abs(newY - this.grid.playerPos.y);
+            const duration = Math.min(120 * (dist + 1), 600);
             this.tweens.add({
                 targets: this.playerSprite,
                 x: px,
                 y: py,
-                duration: 80,
-                ease: 'Power2',
+                duration: duration,
+                ease: 'Power3.easeOut',
                 onComplete: () => {
                     this.isAnimating = false;
                 }

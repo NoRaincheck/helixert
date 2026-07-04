@@ -510,26 +510,14 @@ class HelixCommands {
         let x = startX;
         let y = startY;
 
-        if (wordType === 1) {
-            while (x < grid.width - 1) {
-                const nextTile = grid.getTile(x + 1, y);
-                if (nextTile === TileType.WALL || nextTile === TileType.TARGET || nextTile === TileType.BONUS) {
-                    break;
-                }
-                if (!grid.isWalkable(x + 1, y)) break;
+        while (x < grid.width) {
+            const nextTile = grid.getTile(x + 1, y);
+            if (nextTile === TileType.WALL) break;
+            if (nextTile === TileType.EMPTY || nextTile === TileType.TARGET || nextTile === TileType.BONUS) {
                 x++;
+            } else {
+                break;
             }
-            if (x < grid.width - 1 && grid.getTile(x + 1, y) === TileType.EMPTY) x++;
-        } else {
-            while (x < grid.width - 1) {
-                const nextTile = grid.getTile(x + 1, y);
-                if (nextTile === TileType.WALL || nextTile === TileType.TARGET || nextTile === TileType.BONUS) {
-                    break;
-                }
-                if (!grid.isWalkable(x + 1, y)) break;
-                x++;
-            }
-            if (x < grid.width - 1 && grid.getTile(x + 1, y) === TileType.EMPTY) x++;
         }
 
         return { x, y };
@@ -539,26 +527,14 @@ class HelixCommands {
         let x = startX;
         let y = startY;
 
-        if (wordType === 1) {
-            while (x > 0) {
-                const prevTile = grid.getTile(x - 1, y);
-                if (prevTile === TileType.WALL || prevTile === TileType.TARGET || prevTile === TileType.BONUS) {
-                    break;
-                }
-                if (!grid.isWalkable(x - 1, y)) break;
+        while (x > 0) {
+            const prevTile = grid.getTile(x - 1, y);
+            if (prevTile === TileType.WALL) break;
+            if (prevTile === TileType.EMPTY || prevTile === TileType.TARGET || prevTile === TileType.BONUS) {
                 x--;
+            } else {
+                break;
             }
-            if (x > 0 && grid.getTile(x - 1, y) === TileType.EMPTY) x--;
-        } else {
-            while (x > 0) {
-                const prevTile = grid.getTile(x - 1, y);
-                if (prevTile === TileType.WALL || prevTile === TileType.TARGET || prevTile === TileType.BONUS) {
-                    break;
-                }
-                if (!grid.isWalkable(x - 1, y)) break;
-                x--;
-            }
-            if (x > 0 && grid.getTile(x - 1, y) === TileType.EMPTY) x--;
         }
 
         return { x, y };
