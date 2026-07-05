@@ -1,6 +1,6 @@
 const Worlds = [
     {
-        num: 1,
+        num: 0,
         name: 'First Steps',
         description: 'Basic Movement',
         icon: '🍦',
@@ -8,7 +8,7 @@ const Worlds = [
         commands: ['h', 'j', 'k', 'l', 'w', 'b', 'e', 'W', 'B', 'E', '0', '$', '^']
     },
     {
-        num: 2,
+        num: 1,
         name: 'Learning the Routes',
         description: 'Chain motions with counts & gg',
         icon: '🔗',
@@ -16,7 +16,7 @@ const Worlds = [
         commands: ['h', 'j', 'k', 'l', 'g', 'w', 'b', 'e']
     },
     {
-        num: 3,
+        num: 2,
         name: 'Character Hunt',
         description: 'Find & Till',
         icon: '🔍',
@@ -24,7 +24,7 @@ const Worlds = [
         commands: ['f', 'F', 't', 'T', ';', ',']
     },
     {
-        num: 4,
+        num: 3,
         name: 'Scoops & Dops',
         description: 'Editing Commands',
         icon: '✏️',
@@ -32,7 +32,7 @@ const Worlds = [
         commands: ['r', 'd', 'c', 'x', 'u', 'U', 'y', 'p', 'i', 'a', 'o']
     },
     {
-        num: 5,
+        num: 4,
         name: 'Selection Station',
         description: 'Advanced Selection',
         icon: '🎯',
@@ -40,7 +40,7 @@ const Worlds = [
         commands: ['v', ';', 's', '%']
     },
     {
-        num: 6,
+        num: 5,
         name: 'Goto Galaxy',
         description: 'Navigation Mastery',
         icon: '🚀',

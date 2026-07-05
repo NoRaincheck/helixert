@@ -115,7 +115,7 @@ class LevelSelectScene extends Phaser.Scene {
                 btnBg.strokeRoundedRect(bx, by, btnW, btnH, 6);
                 this.container.add(btnBg);
 
-                const num = this.add.text(bx + 8, by + 6, `${world.num}.${li + 1}`, {
+                const num = this.add.text(bx + 8, by + 6, `${world.num + 1}.${li + 1}`, {
                     fontSize: '10px',
                     fontFamily: 'Courier New, monospace',
                     color: completed ? '#4ecdc4' : (available ? '#8888aa' : '#444455')
@@ -206,7 +206,7 @@ class LevelSelectScene extends Phaser.Scene {
             unlockBtn.on('pointerover', () => unlockBtn.setColor('#ffd93d'));
             unlockBtn.on('pointerout', () => unlockBtn.setColor('#555577'));
             unlockBtn.on('pointerdown', () => {
-                GameState.data.unlockedWorlds = [1, 2, 3, 4, 5, 6];
+                GameState.data.unlockedWorlds = [0, 1, 2, 3, 4, 5];
                 GameState.save();
                 this.scene.restart();
             });

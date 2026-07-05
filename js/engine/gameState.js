@@ -14,7 +14,7 @@ const GameState = {
 
     getDefault() {
         return {
-            unlockedWorlds: [1],
+            unlockedWorlds: [0],
             completedLevels: {},
             bestScores: {}
         };
@@ -46,7 +46,7 @@ const GameState = {
 
         if (completedInWorld >= totalLevelsInWorld) {
             const nextWorld = worldNum + 1;
-            if (nextWorld <= 6 && !this.data.unlockedWorlds.includes(nextWorld)) {
+            if (nextWorld <= 5 && !this.data.unlockedWorlds.includes(nextWorld)) {
                 this.data.unlockedWorlds.push(nextWorld);
             }
         }

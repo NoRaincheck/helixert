@@ -1,8 +1,8 @@
 const Levels = [
-    // ========== WORLD 1: First Steps (Basic Movement) ==========
+    // ========== WORLD 0: First Steps (Basic Movement) ==========
     {
-        id: 'w1-1',
-        world: 1,
+        id: 'w0-1',
+        world: 0,
         name: 'Hello, Helix!',
         description: 'Use h, j, k, l to reach the food',
         commands: ['h', 'j', 'k', 'l'],
@@ -23,8 +23,8 @@ const Levels = [
         }
     },
     {
-        id: 'w1-2',
-        world: 1,
+        id: 'w0-2',
+        world: 0,
         name: 'The Long Street',
         description: 'Use g to goto the start or end of the street.',
         commands: ['h', 'j', 'k', 'l', 'g'],
@@ -42,8 +42,8 @@ const Levels = [
         }
     },
     {
-        id: 'w1-3',
-        world: 1,
+        id: 'w0-3',
+        world: 0,
         name: 'Word Hops',
         description: 'Use w, b, e to jump between items',
         commands: ['w'],
@@ -59,8 +59,8 @@ const Levels = [
         }
     },
     {
-        id: 'w1-4',
-        world: 1,
+        id: 'w0-4',
+        world: 0,
         name: 'There and back',
         description: 'w hops forward, b hops back. Weave the round and serve every stop.',
         commands: ['h', 'j', 'k', 'l', 'w', 'b'],
@@ -77,8 +77,8 @@ const Levels = [
         }
     },
     {
-        id: 'w1-5',
-        world: 1,
+        id: 'w0-5',
+        world: 0,
         name: 'Rush Hour',
         description: 'Big map! Use counts like 3j to cover ground fast, and ge (goto end) to drop to the bottom.',
         commands: ['h', 'j', 'k', 'l', 'g', 'e'],
@@ -101,10 +101,10 @@ const Levels = [
         }
     },
 
-    // ========== WORLD 2: Learning the Routes (Counts & Goto) ==========
+    // ========== WORLD 1: Learning the Routes (Counts & Goto) ==========
     {
-        id: 'w2-1',
-        world: 2,
+        id: 'w1-1',
+        world: 1,
         name: 'Count On',
         description: 'Chain motions: w forward, gl to the far curb, ge to the start of the line, b back. Plan the loop.',
         commands: ['w', 'g'],
@@ -122,8 +122,8 @@ const Levels = [
         }
     },
     {
-        id: 'w2-2',
-        world: 2,
+        id: 'w1-2',
+        world: 1,
         name: 'Express Elevator',
         description: 'gg jumps to the top row, ge drops to the bottom. Skip the middle floors.',
         commands: ['g'],
@@ -143,8 +143,8 @@ const Levels = [
         }
     },
     {
-        id: 'w2-3',
-        world: 2,
+        id: 'w1-3',
+        world: 1,
         name: 'Precision Parking',
         description: 'Each block is a queue of bystanders (X); only the last one is a customer (C). e parks on the END of the block, right on them.',
         commands: ['e'],
@@ -160,8 +160,8 @@ const Levels = [
         }
     },
     {
-        id: 'w2-4',
-        world: 2,
+        id: 'w1-4',
+        world: 1,
         name: 'Downtown Dash',
         description: 'w serves each block you land on. Counts skip customers, so tap it out.',
         commands: ['w'],
@@ -179,8 +179,8 @@ const Levels = [
         }
     },
     {
-        id: 'w2-5',
-        world: 2,
+        id: 'w1-5',
+        world: 1,
         name: 'Kerb to Kerb',
         description: 'g (goto) start of line and end of line (h/l)',
         commands: ['h', 'j', 'k', 'l', 'g'],
@@ -198,10 +198,10 @@ const Levels = [
         }
     },
 
-    // ========== WORLD 3: Character Hunt (Find & Till) ==========
+    // ========== WORLD 2: Character Hunt (Find & Till) ==========
     {
-        id: 'w3-1',
-        world: 3,
+        id: 'w2-1',
+        world: 2,
         name: 'Find Right',
         description: 'Use f<char> to find a character forward',
         commands: ['h', 'j', 'k', 'l', 'f'],
@@ -221,8 +221,8 @@ const Levels = [
         }
     },
     {
-        id: 'w3-2',
-        world: 3,
+        id: 'w2-2',
+        world: 2,
         name: 'Find Left',
         description: 'Use F<char> to find a character backward',
         commands: ['h', 'j', 'k', 'l', 'f', 'F'],
@@ -242,8 +242,8 @@ const Levels = [
         }
     },
     {
-        id: 'w3-3',
-        world: 3,
+        id: 'w2-3',
+        world: 2,
         name: 'Till There',
         description: 'Use t<char> to stop just before a character',
         commands: ['h', 'j', 'k', 'l', 'f', 't'],
@@ -263,8 +263,8 @@ const Levels = [
         }
     },
     {
-        id: 'w3-4',
-        world: 3,
+        id: 'w2-4',
+        world: 2,
         name: 'Till Back',
         description: 'Use T<char> to stop just after a backward character',
         commands: ['h', 'j', 'k', 'l', 'f', 'F', 't', 'T'],
@@ -284,8 +284,8 @@ const Levels = [
         }
     },
     {
-        id: 'w3-5',
-        world: 3,
+        id: 'w2-5',
+        world: 2,
         name: 'Repeat Seeker',
         description: 'Use ; and , to repeat find motions',
         commands: ['h', 'j', 'k', 'l', 'f', 'F', 't', 'T', ';', ','],
@@ -305,10 +305,10 @@ const Levels = [
         }
     },
 
-    // ========== WORLD 4: Scoops & Dops (Editing Commands) ==========
+    // ========== WORLD 3: Scoops & Dops (Editing Commands) ==========
     {
-        id: 'w4-1',
-        world: 4,
+        id: 'w3-1',
+        world: 3,
         name: 'Replace & Reveal',
         description: 'Use r<char> to replace characters',
         commands: ['h', 'j', 'k', 'l', 'r'],
@@ -328,8 +328,8 @@ const Levels = [
         }
     },
     {
-        id: 'w4-2',
-        world: 4,
+        id: 'w3-2',
+        world: 3,
         name: 'Delete & Destroy',
         description: 'Use d to delete characters',
         commands: ['h', 'j', 'k', 'l', 'd'],
@@ -349,8 +349,8 @@ const Levels = [
         }
     },
     {
-        id: 'w4-3',
-        world: 4,
+        id: 'w3-3',
+        world: 3,
         name: 'Line Select',
         description: 'Use x to select entire lines',
         commands: ['h', 'j', 'k', 'l', 'x', 'd'],
@@ -370,8 +370,8 @@ const Levels = [
         }
     },
     {
-        id: 'w4-4',
-        world: 4,
+        id: 'w3-4',
+        world: 3,
         name: 'Undo Trick',
         description: 'Use u to undo and try different paths',
         commands: ['h', 'j', 'k', 'l', 'd', 'u'],
@@ -391,8 +391,8 @@ const Levels = [
         }
     },
     {
-        id: 'w4-5',
-        world: 4,
+        id: 'w3-5',
+        world: 3,
         name: 'Edit Master',
         description: 'Combine r, d, c to reshape the maze',
         commands: ['h', 'j', 'k', 'l', 'r', 'd', 'c'],
@@ -412,10 +412,10 @@ const Levels = [
         }
     },
 
-    // ========== WORLD 5: Selection Station (Advanced Selection) ==========
+    // ========== WORLD 4: Selection Station (Advanced Selection) ==========
     {
-        id: 'w5-1',
-        world: 5,
+        id: 'w4-1',
+        world: 4,
         name: 'Visual Range',
         description: 'Use v to enter select mode and extend selection',
         commands: ['h', 'j', 'k', 'l', 'v', 'd'],
@@ -435,8 +435,8 @@ const Levels = [
         }
     },
     {
-        id: 'w5-2',
-        world: 5,
+        id: 'w4-2',
+        world: 4,
         name: 'Collapse',
         description: 'Use ; to collapse selection',
         commands: ['h', 'j', 'k', 'l', 'v', ';', 'd'],
@@ -456,8 +456,8 @@ const Levels = [
         }
     },
     {
-        id: 'w5-3',
-        world: 5,
+        id: 'w4-3',
+        world: 4,
         name: 'Select All',
         description: 'Use % to select the entire file',
         commands: ['h', 'j', 'k', 'l', 'v', '%', 'd'],
@@ -477,8 +477,8 @@ const Levels = [
         }
     },
     {
-        id: 'w5-4',
-        world: 5,
+        id: 'w4-4',
+        world: 4,
         name: 'Swap & Dance',
         description: 'Use ~ to swap case and v for visual selection',
         commands: ['h', 'j', 'k', 'l', 'v', '~', 'd'],
@@ -498,8 +498,8 @@ const Levels = [
         }
     },
     {
-        id: 'w5-5',
-        world: 5,
+        id: 'w4-5',
+        world: 4,
         name: 'Selection Pro',
         description: 'Master visual selection to navigate',
         commands: ['h', 'j', 'k', 'l', 'v', ';', '%', 'd', 'r'],
@@ -519,10 +519,10 @@ const Levels = [
         }
     },
 
-    // ========== WORLD 6: Goto Galaxy (Navigation Mastery) ==========
+    // ========== WORLD 5: Goto Galaxy (Navigation Mastery) ==========
     {
-        id: 'w6-1',
-        world: 6,
+        id: 'w5-1',
+        world: 5,
         name: 'Jump to Start',
         description: 'Use gg to jump to the top of the map',
         commands: ['h', 'j', 'k', 'l', 'g'],
@@ -543,8 +543,8 @@ const Levels = [
         }
     },
     {
-        id: 'w6-2',
-        world: 6,
+        id: 'w5-2',
+        world: 5,
         name: 'Jump to End',
         description: 'Use ge to jump to the end of the file',
         commands: ['h', 'j', 'k', 'l', 'g'],
@@ -565,8 +565,8 @@ const Levels = [
         }
     },
     {
-        id: 'w6-3',
-        world: 6,
+        id: 'w5-3',
+        world: 5,
         name: 'Edge Jumper',
         description: 'Use gh and gl to jump to line edges',
         commands: ['h', 'j', 'k', 'l', 'g'],
@@ -586,8 +586,8 @@ const Levels = [
         }
     },
     {
-        id: 'w6-4',
-        world: 6,
+        id: 'w5-4',
+        world: 5,
         name: 'Floor Markers',
         description: 'Use gf to jump to floor marks',
         commands: ['h', 'j', 'k', 'l', 'g'],
@@ -607,8 +607,8 @@ const Levels = [
         }
     },
     {
-        id: 'w6-5',
-        world: 6,
+        id: 'w5-5',
+        world: 5,
         name: 'Helix Master',
         description: 'Combine all commands to conquer the final maze!',
         commands: ['h', 'j', 'k', 'l', 'w', 'b', 'e', 'f', 'F', 't', 'T', 'g', 'd', 'r'],

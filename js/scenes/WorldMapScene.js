@@ -105,7 +105,7 @@ class WorldMapScene extends Phaser.Scene {
             color: '#666688'
         }).setOrigin(0.5);
 
-        const allUnlocked = [1, 2, 3, 4, 5].every(n => GameState.isWorldUnlocked(n));
+        const allUnlocked = [0, 1, 2, 3, 4].every(n => GameState.isWorldUnlocked(n));
         if (!allUnlocked) {
             const unlockBtn = this.add.text(width / 2, height - 20, '[ I already know Helix — unlock all ]', {
                 fontSize: '12px',
@@ -117,7 +117,7 @@ class WorldMapScene extends Phaser.Scene {
             unlockBtn.on('pointerover', () => unlockBtn.setColor('#ffd93d'));
             unlockBtn.on('pointerout', () => unlockBtn.setColor('#555577'));
             unlockBtn.on('pointerdown', () => {
-                GameState.data.unlockedWorlds = [1, 2, 3, 4, 5];
+                GameState.data.unlockedWorlds = [0, 1, 2, 3, 4];
                 GameState.save();
                 this.scene.restart();
             });

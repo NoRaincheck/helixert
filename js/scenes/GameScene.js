@@ -243,7 +243,7 @@ class GameScene extends Phaser.Scene {
         hudBg.lineBetween(0, height - 120, width, height - 120);
 
         const world = Worlds.find(w => w.num === this.worldNum);
-        this.add.text(15, height - 112, `${world.icon} W${this.worldNum}: ${this.levelData.name}`, {
+        this.add.text(15, height - 112, `${world.icon} W${this.worldNum + 1}: ${this.levelData.name}`, {
             fontSize: '14px',
             fontFamily: 'Courier New, monospace',
             fontStyle: 'bold',
