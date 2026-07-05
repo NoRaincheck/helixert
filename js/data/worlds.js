@@ -17,11 +17,11 @@ const Worlds = [
     },
     {
         num: 2,
-        name: 'Character Hunt',
-        description: 'Find & Till',
-        icon: '🔍',
-        color: 0xff6b6b,
-        commands: ['f', 'F', 't', 'T', ';', ',']
+        name: 'The Stock Room',
+        description: 'Edit the buffer: delete, yank, paste, and text objects',
+        icon: '🍰',
+        color: 0xffa07a,
+        commands: ['d', 'y', 'p', 'r', 'c', 'di', 'da']
     },
     {
         num: 3,

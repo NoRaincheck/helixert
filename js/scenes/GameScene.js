@@ -21,6 +21,7 @@ class GameScene extends Phaser.Scene {
         this.keystrokeCount = 0;
         this.isAnimating = false;
         this.commandLog = [];
+        this.yankBuffer = null;
 
         const { width, height } = this.cameras.main;
 
@@ -420,6 +421,69 @@ class GameScene extends Phaser.Scene {
                     if (tile === TileType.DOOR) {
                         this.grid.setTile(x, from.y, TileType.EMPTY);
                         this.updateTileSprite(x, from.y);
+                    }
+                }
+            }
+
+            if (result.action === 'yank') {
+                const pos = this.grid.playerPos;
+                const y = pos.y;
+                this.yankBuffer = [];
+                for (let x = 0; x < this.grid.width; x++) {
+                    if (this.grid.getTile(x, y) === TileType.DOOR) {
+                        this.yankBuffer.push({ x: x - pos.x, y: 0 });
+                    }
+                }
+            }
+
+            if (result.action === 'paste') {
+                if (this.yankBuffer) {
+                    const pos = this.grid.playerPos;
+                    for (const door of this.yankBuffer) {
+                        const newX = pos.x + door.x;
+                        const newY = pos.y + door.y;
+                        if (newX >= 0 && newX < this.grid.width && newY >= 0 && newY < this.grid.height) {
+                            this.grid.setTile(newX, newY, TileType.DOOR);
+                            this.updateTileSprite(newX, newY);
+                        }
+                    }
+                }
+            }
+
+            if (result.action === 'deleteInside' || result.action === 'deleteAround') {
+                const pos = this.grid.playerPos;
+                const y = pos.y;
+                const isInside = result.action === 'deleteInside';
+
+                // Find word boundaries (contiguous run of doors on current line)
+                let startX = pos.x;
+                while (startX > 0 && this.grid.getTile(startX - 1, y) === TileType.DOOR) {
+                    startX--;
+                }
+                let endX = pos.x;
+                while (endX < this.grid.width - 1 && this.grid.getTile(endX + 1, y) === TileType.DOOR) {
+                    endX++;
+                }
+
+                let deleteStart = startX;
+                let deleteEnd = endX;
+
+                if (!isInside) {
+                    // deleteAround: also delete adjacent empty cells up to walls
+                    while (deleteStart > 0 && this.grid.getTile(deleteStart - 1, y) === TileType.EMPTY) {
+                        deleteStart--;
+                    }
+                    while (deleteEnd < this.grid.width - 1 && this.grid.getTile(deleteEnd + 1, y) === TileType.EMPTY) {
+                        deleteEnd++;
+                    }
+                }
+
+                for (let x = deleteStart; x <= deleteEnd; x++) {
+                    const tile = this.grid.getTile(x, y);
+                    if (isInside && x === pos.x) continue;
+                    if (tile === TileType.DOOR || (!isInside && tile === TileType.EMPTY)) {
+                        this.grid.setTile(x, y, TileType.EMPTY);
+                        this.updateTileSprite(x, y);
                     }
                 }
             }
