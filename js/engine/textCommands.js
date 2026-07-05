@@ -135,14 +135,11 @@ class TextCommands {
 
             // Direct commands
             case 'x': {
-                // Delete character under cursor
-                const line = textBuffer.getLine(pos.line);
-                if (pos.col < line.length) {
-                    textBuffer.deleteRange(pos.line, pos.col, pos.col + 1);
-                    textBuffer.clampCursor();
-                    return { moved: false, action: 'delete', linesChanged: true };
-                }
-                return { moved: false };
+                // Select entire line (Helix noun-verb: x selects, then d deletes)
+                this.mode = 'SELECT';
+                this.selectStart = { line: pos.line, col: 0 };
+                textBuffer.moveCursor(pos.line, textBuffer.getLineLength(pos.line));
+                return { moved: false, action: 'selectLine', linesChanged: false };
             }
             case 'p': {
                 if (textBuffer.yankBuffer !== null) {

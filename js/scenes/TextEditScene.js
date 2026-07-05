@@ -97,6 +97,7 @@ class TextEditScene extends Phaser.Scene {
         // Create text containers
         this.lhsTexts = [];
         this.rhsTexts = [];
+        this.selectionHighlights = [];
         this.cursorHighlight = null;
     }
 
@@ -106,9 +107,11 @@ class TextEditScene extends Phaser.Scene {
         this.rhsTexts.forEach(t => t.destroy());
         if (this.cursorHighlight) this.cursorHighlight.destroy();
         if (this.cursorBlink) this.cursorBlink.remove();
+        this.selectionHighlights.forEach(h => h.destroy());
 
         this.lhsTexts = [];
         this.rhsTexts = [];
+        this.selectionHighlights = [];
 
         const manifestLines = this.textBuffer.lines;
         const targetLines = this.levelData.target.split('\n');
@@ -172,6 +175,31 @@ class TextEditScene extends Phaser.Scene {
                     },
                     loop: true
                 });
+            }
+
+            // Highlight selection range
+            const selectStart = this.textCommands.selectStart;
+            if (selectStart && this.textCommands.getMode() === 'SELECT') {
+                const from = selectStart.line < cursor.line || (selectStart.line === cursor.line && selectStart.col <= cursor.col)
+                    ? selectStart : cursor;
+                const to = selectStart.line < cursor.line || (selectStart.line === cursor.line && selectStart.col <= cursor.col)
+                    ? cursor : selectStart;
+
+                if (i >= from.line && i <= to.line) {
+                    const selStartCol = (i === from.line) ? from.col : 0;
+                    const selEndCol = (i === to.line) ? to.col + 1 : this.textBuffer.getLineLength(i);
+                    if (selStartCol < selEndCol) {
+                        const selGfx = this.add.graphics();
+                        selGfx.fillStyle(0x4ecdc4, 0.3);
+                        selGfx.fillRect(
+                            textStartX + selStartCol * 9.6 - 1,
+                            y - 2,
+                            (selEndCol - selStartCol) * 9.6 + 2,
+                            this.LINE_HEIGHT
+                        );
+                        this.selectionHighlights.push(selGfx);
+                    }
+                }
             }
         }
 

@@ -32,8 +32,8 @@ This game uses **Helix-style** keybindings, NOT standard Vim. Helix uses **noun-
 
 World 2 levels run through `TextCommands` (`js/engine/textCommands.js`), NOT `HelixCommands`. The command set is smaller:
 
-- `x` deletes the character under the cursor (does NOT select a line)
-- No visual/select mode (`v` is not implemented)
+- `x` selects the whole line (Helix noun-verb: `x` selects, then `d` deletes)
+- No `v` for character-range selection (only line selection via `x`)
 - No `m` (match) command
 - No `Space + ?` command palette
 - `dd` falls through to single-char delete (no line delete)

@@ -138,7 +138,8 @@ class ResultScene extends Phaser.Scene {
         retryBtn.on('pointerover', () => retryBtn.setColor('#ffffff'));
         retryBtn.on('pointerout', () => retryBtn.setColor('#ff6b6b'));
         retryBtn.on('pointerdown', () => {
-            this.scene.start('GameScene', { levelId: this.levelId, worldNum: this.worldNum });
+            const scene = this.worldNum === 2 ? 'TextEditScene' : 'GameScene';
+            this.scene.start(scene, { levelId: this.levelId, worldNum: this.worldNum });
         });
 
         const nextLevel = Levels.find(l => l.world === this.worldNum && Levels.indexOf(l) === Levels.indexOf(levelData) + 1);
@@ -155,7 +156,8 @@ class ResultScene extends Phaser.Scene {
         nextBtn.on('pointerout', () => nextBtn.setColor('#4ecdc4'));
         nextBtn.on('pointerdown', () => {
             if (nextLevel) {
-                this.scene.start('GameScene', { levelId: nextLevel.id, worldNum: this.worldNum });
+                const scene = this.worldNum === 2 ? 'TextEditScene' : 'GameScene';
+                this.scene.start(scene, { levelId: nextLevel.id, worldNum: this.worldNum });
             } else {
                 this.scene.start('LevelSelectScene');
             }
@@ -176,7 +178,8 @@ class ResultScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-ENTER', () => {
             if (nextLevel) {
-                this.scene.start('GameScene', { levelId: nextLevel.id, worldNum: this.worldNum });
+                const scene = this.worldNum === 2 ? 'TextEditScene' : 'GameScene';
+                this.scene.start(scene, { levelId: nextLevel.id, worldNum: this.worldNum });
             } else {
                 this.scene.start('LevelSelectScene');
             }
