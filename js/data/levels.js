@@ -236,7 +236,7 @@ const Levels = [
         id: 'w2-4',
         world: 2,
         name: 'Fix the Labels',
-        description: 'Try using Space + ? to see the keymaps. You can match (m) inside (i) word (w) to select text inside quotes.',
+        description: 'Try using Space + ? to see the keymaps. You can match (m) inside (i) word (w) to select text inside quotes. Alternative approach is to use w to select word. Note that you can revert to character selection using ;',
         commands: ['m', 'i', 'w'],
         par: 3,
         wizard: 2,

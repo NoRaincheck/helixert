@@ -119,7 +119,17 @@ class TextCommands {
             }
 
             // Buffer commands
-            case 'd': this.buffer = ['d']; return { moved: false };
+            case 'd': {
+                // Delete character under cursor (Helix: d is a verb, single press deletes char)
+                const line = textBuffer.getLine(pos.line);
+                if (pos.col < line.length) {
+                    textBuffer.deleteRange(pos.line, pos.col, pos.col + 1);
+                    textBuffer.clampCursor();
+                    this.lastCommand = { type: 'deleteChar' };
+                    return { moved: false, action: 'deleteChar', linesChanged: false };
+                }
+                return { moved: false };
+            }
             case 'y': this.buffer = ['y']; return { moved: false };
             case 'r': this.buffer = ['r']; return { moved: false };
 
@@ -192,16 +202,6 @@ class TextCommands {
         if (prefix === 'd') {
             this.buffer = [];
             switch (key) {
-                case 'd': {
-                    // Delete entire line
-                    const deleted = textBuffer.deleteLine(pos.line);
-                    if (deleted !== null) {
-                        textBuffer.clampCursor();
-                        this.lastCommand = { type: 'deleteLine' };
-                        return { moved: false, action: 'deleteLine', linesChanged: true };
-                    }
-                    return { moved: false };
-                }
                 case '$': {
                     // Delete to end of line
                     const deleted = textBuffer.deleteToLineEnd(pos.line, pos.col);
@@ -231,8 +231,17 @@ class TextCommands {
                     this.buffer = ['d', 'a'];
                     return { moved: false };
                 }
-                default:
-                    return { moved: false, unknown: key };
+                default: {
+                    // No valid motion after 'd' — delete character at cursor (like 'x')
+                    const line = textBuffer.getLine(pos.line);
+                    if (pos.col < line.length) {
+                        textBuffer.deleteRange(pos.line, pos.col, pos.col + 1);
+                        textBuffer.clampCursor();
+                        this.lastCommand = { type: 'deleteChar' };
+                        return { moved: false, action: 'deleteChar', linesChanged: false };
+                    }
+                    return { moved: false };
+                }
             }
         }
 
@@ -454,10 +463,15 @@ class TextCommands {
         switch (cmd.type) {
             case 'move':
                 return this.executeSingle(cmd.key, textBuffer);
-            case 'deleteLine':
-                textBuffer.deleteLine(pos.line);
-                textBuffer.clampCursor();
-                return { moved: false, action: 'deleteLine', linesChanged: true };
+            case 'deleteChar': {
+                const line = textBuffer.getLine(pos.line);
+                if (pos.col < line.length) {
+                    textBuffer.deleteRange(pos.line, pos.col, pos.col + 1);
+                    textBuffer.clampCursor();
+                    return { moved: false, action: 'deleteChar', linesChanged: false };
+                }
+                return { moved: false };
+            }
             case 'deleteToLineEnd':
                 textBuffer.deleteToLineEnd(pos.line, pos.col);
                 textBuffer.clampCursor();
