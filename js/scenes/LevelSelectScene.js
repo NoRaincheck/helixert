@@ -181,7 +181,11 @@ class LevelSelectScene extends Phaser.Scene {
                     });
 
                     hitArea.on('pointerdown', () => {
-                        this.scene.start('GameScene', { levelId: level.id, worldNum: world.num });
+                        if (world.num === 2) {
+                            this.scene.start('TextEditScene', { levelId: level.id, worldNum: world.num });
+                        } else {
+                            this.scene.start('GameScene', { levelId: level.id, worldNum: world.num });
+                        }
                     });
                 }
             });

@@ -198,116 +198,61 @@ const Levels = [
         }
     },
 
-    // ========== WORLD 2: The Stock Room (Edit the Buffer) ==========
+    // ========== WORLD 2: The Stock Room (Text Editing) ==========
     {
         id: 'w2-1',
         world: 2,
-        name: 'Clear the Plate',
-        description: "Delete entire lines of doors to clear the plate. Position on a door and press dd to delete the line. Transform 'chocolate cake --> ' into nothing.",
-        commands: ['h', 'j', 'k', 'l', 'd'],
+        name: 'Fix the Chocolate',
+        description: 'd deletes the character under the cursor',
+        commands: ['d'],
         par: 4,
-        wizard: 2,
-        grid: {
-            width: 8,
-            height: 5,
-            start: { x: 1, y: 1 },
-            tiles: [
-                '########',
-                '#SDDDD.#',
-                '#......#',
-                '#DDDD..#',
-                '#..TTT.#',
-                '########',
-            ]
-        }
+        wizard: 3,
+        manifest: 'choc!!!!olate\nstrawberry',
+        target: 'chocolate\nstrawberry'
     },
     {
         id: 'w2-2',
         world: 2,
-        name: 'Trim the Frosting',
-        description: "Trim excess by deleting from cursor to end of line. Position on a door and press d$ to delete to end. Transform 'strawberry tart --> ' by trimming the excess.",
-        commands: ['h', 'j', 'k', 'l', 'd', '$'],
-        par: 6,
-        wizard: 3,
-        grid: {
-            width: 8,
-            height: 5,
-            start: { x: 1, y: 1 },
-            tiles: [
-                '########',
-                '#S..DDD#',
-                '#......#',
-                '#..D..T#',
-                '#......#',
-                '########',
-            ]
-        }
+        name: 'Clear the Expired',
+        description: 'x selects the whole line and then d deletes and sends it to clipboard, if you make a mistake use u to undo',
+        commands: ['d', 'w', 'u'],
+        par: 2,
+        wizard: 1,
+        manifest: 'milk\nlemon\nbread\nlemon\neggs',
+        target: 'milk\nbread\neggs'
     },
     {
         id: 'w2-3',
         world: 2,
-        name: 'Yank & Stack',
-        description: "Copy a line of doors and paste it elsewhere. Use y to yank the current line, move, then p to paste. Copy 'vanilla cream --> ' and stack it.",
-        commands: ['h', 'j', 'k', 'l', 'y', 'p'],
-        par: 5,
-        wizard: 2,
-        grid: {
-            width: 8,
-            height: 5,
-            start: { x: 1, y: 1 },
-            tiles: [
-                '########',
-                '#SDDDD.#',
-                '#......#',
-                '#......#',
-                '#..TTT.#',
-                '########',
-            ]
-        }
+        name: 'Restock Run',
+        description: 'x selects the whole line and then d deletes and sends it to clipboard. p then pastes after the cursor',
+        commands: ['x', 'd', 'p'],
+        par: 2,
+        wizard: 1,
+        manifest: 'mint\nvanilla\nchocolate',
+        target: 'vanilla\nchocolate\nmint'
     },
     {
         id: 'w2-4',
         world: 2,
-        name: 'The Right Portion',
-        description: "Use text objects for precision. Position on a door and press diw to delete inside a word, or daw to delete around a word. Select the right portion of 'mousse --> '.",
-        commands: ['h', 'j', 'k', 'l', 'd', 'i', 'a', 'w'],
-        par: 8,
-        wizard: 4,
-        grid: {
-            width: 8,
-            height: 5,
-            start: { x: 1, y: 1 },
-            tiles: [
-                '########',
-                '#SDDDD.#',
-                '#......#',
-                '#DDDD..#',
-                '#..TTT.#',
-                '########',
-            ]
-        }
+        name: 'Fix the Labels',
+        description: 'Try using Space + ? to see the keymaps. You can match (m) inside (i) word (w) to select text inside quotes.',
+        commands: ['m', 'i', 'w'],
+        par: 3,
+        wizard: 2,
+        manifest: 'name: "vanilla"\nstock: 40kg!!',
+        target: 'name: ""\nstock: 40kg'
     },
     {
         id: 'w2-5',
         world: 2,
-        name: 'Master Chef',
-        description: "Combine all editing commands to complete the dessert. Use dd, d$, y, p, diw, daw to transform 'Manifest --> Target' into the final recipe.",
-        commands: ['h', 'j', 'k', 'l', 'd', 'y', 'p', 'i', 'a', 'w', '$'],
-        par: 12,
-        wizard: 5,
-        grid: {
-            width: 10,
-            height: 5,
-            start: { x: 1, y: 1 },
-            tiles: [
-                '##########',
-                '#SDDDD..T#',
-                '#........#',
-                '#DDDD..D.#',
-                '#..TTT...#',
-                '##########',
-            ]
-        }
+        name: 'Copy the best sellers',
+        description: 'x selects the whole line, and y copies, p pastes it below. Copy each tub once so the popular flavours are double-stocked.',
+        commands: ['x', 'p', 'y'],
+        par: 2,
+        wizard: 1,
+        manifest: 'vanilla\nchocolate',
+        target: 'vanilla\nvanilla\nchocolate\nchocolate'
     },
 
     // ========== WORLD 3: Scoops & Dops (Editing Commands) ==========

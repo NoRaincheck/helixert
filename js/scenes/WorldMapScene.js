@@ -204,7 +204,11 @@ class WorldMapScene extends Phaser.Scene {
             });
 
             hitArea.on('pointerdown', () => {
-                this.scene.start('GameScene', { levelId: level.id, worldNum });
+                if (worldNum === 2) {
+                    this.scene.start('TextEditScene', { levelId: level.id, worldNum });
+                } else {
+                    this.scene.start('GameScene', { levelId: level.id, worldNum });
+                }
             });
         });
 
