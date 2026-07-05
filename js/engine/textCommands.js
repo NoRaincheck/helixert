@@ -122,6 +122,12 @@ class TextCommands {
             case 'd': {
                 // Delete character under cursor (Helix: d is a verb, single press deletes char)
                 const line = textBuffer.getLine(pos.line);
+                if (line.length === 0) {
+                    textBuffer.deleteLine(pos.line);
+                    textBuffer.clampCursor();
+                    this.lastCommand = { type: 'deleteLine' };
+                    return { moved: false, action: 'deleteLine', linesChanged: true };
+                }
                 if (pos.col < line.length) {
                     textBuffer.deleteRange(pos.line, pos.col, pos.col + 1);
                     textBuffer.clampCursor();
@@ -379,7 +385,12 @@ class TextCommands {
                     }
 
                     if (from.line === to.line) {
-                        textBuffer.deleteRange(from.line, from.col, to.col + 1);
+                        const selLine = textBuffer.getLine(from.line);
+                        if (selLine.length === 0) {
+                            textBuffer.deleteLine(from.line);
+                        } else {
+                            textBuffer.deleteRange(from.line, from.col, to.col + 1);
+                        }
                     } else {
                         // Multi-line delete
                         for (let i = to.line; i >= from.line; i--) {
