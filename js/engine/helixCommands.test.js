@@ -80,6 +80,10 @@ class Grid {
 }
 
 class HelixCommands {
+    constructor() {
+        this.buffer = [];
+    }
+
     moveWordForward(grid, startX, startY, wordType) {
         let x = startX;
         let y = startY;
@@ -309,6 +313,29 @@ class HelixCommands {
             return { x, y: pos.y };
         }
         return null;
+    }
+
+    executeSingle(key, grid) {
+        const pos = grid.playerPos;
+        switch (key) {
+            case 'x':
+                return { moved: false, action: 'selectLine', line: pos.y };
+            default:
+                return { moved: false, unknown: key };
+        }
+    }
+
+    executeBuffered(key, grid) {
+        const prefix = this.buffer.join('');
+        const pos = grid.playerPos;
+        if (prefix === 'd') {
+            this.buffer = [];
+            if (key === 'd') {
+                return { moved: false, action: 'deleteLine', line: pos.y };
+            }
+            return { moved: false, unknown: key };
+        }
+        return { moved: false, unknown: key };
     }
 }
 
@@ -1031,4 +1058,15 @@ Deno.test("gl on bottom row goes to last non-wall", () => {
     g.playerPos = { x: 2, y: 0 };
     const result = cmd.gotoLineEnd(g);
     assertEquals(result, { x: 3, y: 0 });
+});
+
+// --- Tests: line selection ---
+
+Deno.test("x returns selectLine action (for use in SELECT mode)", () => {
+    const g = makeMultiLineGrid(["abc", "def"]);
+    g.playerPos = { x: 0, y: 0 };
+    const testCmd = new HelixCommands();
+    const result = testCmd.executeSingle('x', g);
+    assertEquals(result.action, 'selectLine');
+    assertEquals(result.line, 0);
 });
