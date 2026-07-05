@@ -398,15 +398,18 @@ class TextEditScene extends Phaser.Scene {
 
     setupInput() {
         this.input.keyboard.on('keydown', (event) => {
-            if (event.key === 'Escape') {
+            const key = event.key;
+
+            // In INSERT mode, Escape goes back to NORMAL (not exit level)
+            if (key === 'Escape' && this.textCommands.getMode() === 'INSERT') {
+                // Let textCommands handle it to switch to NORMAL
+            } else if (key === 'Escape') {
                 this.scene.start('LevelSelectScene');
                 return;
             }
 
-            const key = event.key;
-
             // Prevent default for keys we handle
-            if (['Tab', 'Backspace', 'Delete'].includes(key)) {
+            if (['Tab', 'Backspace', 'Delete', 'Enter'].includes(key)) {
                 event.preventDefault();
             }
 

@@ -38,6 +38,10 @@ class TextCommands {
     }
 
     execute(key, textBuffer) {
+        if (this.mode === 'INSERT') {
+            return this.executeInsert(key, textBuffer);
+        }
+
         if (this.mode === 'SELECT') {
             return this.executeSelect(key, textBuffer);
         }
@@ -138,6 +142,29 @@ class TextCommands {
             }
             case 'y': this.buffer = ['y']; return { moved: false };
             case 'r': this.buffer = ['r']; return { moved: false };
+
+            // Insert mode entry
+            case 'i': {
+                this.mode = 'INSERT';
+                return { moved: false, action: 'insertMode' };
+            }
+            case 'a': {
+                this.mode = 'INSERT';
+                textBuffer.moveCursorRelative(0, 1);
+                return { moved: false, action: 'insertMode' };
+            }
+            case 'o': {
+                // Open new line below
+                textBuffer.insertLine(pos.line, '', true);
+                this.mode = 'INSERT';
+                return { moved: false, action: 'insertMode', linesChanged: true };
+            }
+            case 'O': {
+                // Open new line above
+                textBuffer.insertLine(pos.line, '', false);
+                this.mode = 'INSERT';
+                return { moved: false, action: 'insertMode', linesChanged: true };
+            }
 
             // Direct commands
             case 'x': {
@@ -363,11 +390,28 @@ class TextCommands {
     executeSelect(key, textBuffer) {
         const pos = textBuffer.getCursor();
 
+        // Handle buffered 'g' prefix
+        if (this.buffer.length === 1 && this.buffer[0] === 'g') {
+            this.buffer = [];
+            switch (key) {
+                case 'g': textBuffer.moveCursor(0, 0); return { moved: true };
+                case 'e': {
+                    const lastLine = textBuffer.getLineCount() - 1;
+                    textBuffer.moveCursor(lastLine, textBuffer.getLineLength(lastLine));
+                    return { moved: true };
+                }
+                case 'h': textBuffer.moveCursor(pos.line, 0); return { moved: true };
+                case 'l': textBuffer.moveCursor(pos.line, textBuffer.getLineLength(pos.line)); return { moved: true };
+                default: return { moved: false, unknown: key };
+            }
+        }
+
         switch (key) {
             case 'h': textBuffer.moveCursorRelative(0, -1); return { moved: true };
             case 'j': textBuffer.moveCursorRelative(1, 0); return { moved: true };
             case 'k': textBuffer.moveCursorRelative(-1, 0); return { moved: true };
             case 'l': textBuffer.moveCursorRelative(0, 1); return { moved: true };
+            case 'g': this.buffer = ['g']; return { moved: false };
             case 'd':
             case 'x': {
                 // Delete selection
@@ -384,14 +428,28 @@ class TextCommands {
                         to = start;
                     }
 
+                    // Yank before deleting
                     if (from.line === to.line) {
                         const selLine = textBuffer.getLine(from.line);
-                        if (selLine.length === 0) {
+                        const isWholeLine = from.col === 0 && to.col >= selLine.length - 1;
+                        if (isWholeLine) {
+                            textBuffer.yankLine(from.line);
+                            textBuffer.deleteLine(from.line);
+                        } else if (selLine.length === 0) {
                             textBuffer.deleteLine(from.line);
                         } else {
+                            textBuffer.yankRange(from.line, from.col, to.col + 1);
                             textBuffer.deleteRange(from.line, from.col, to.col + 1);
                         }
                     } else {
+                        // Multi-line yank
+                        const lines = [];
+                        for (let i = from.line; i <= to.line; i++) {
+                            lines.push(textBuffer.getLine(i));
+                        }
+                        textBuffer.yankBuffer = lines.join('\n');
+                        textBuffer.yankIsLine = false;
+
                         // Multi-line delete
                         for (let i = to.line; i >= from.line; i--) {
                             if (i === from.line) {
@@ -459,6 +517,62 @@ class TextCommands {
                 return { moved: false };
             }
             default: return { moved: false, unknown: key };
+        }
+    }
+
+    executeInsert(key, textBuffer) {
+        const pos = textBuffer.getCursor();
+
+        switch (key) {
+            case 'Escape': {
+                this.mode = 'NORMAL';
+                return { moved: false, action: 'normalMode' };
+            }
+            case 'Enter': {
+                // Split current line at cursor
+                const line = textBuffer.getLine(pos.line);
+                const before = line.substring(0, pos.col);
+                const after = line.substring(pos.col);
+                textBuffer.lines[pos.line] = before;
+                textBuffer.insertLine(pos.line, after, true);
+                return { moved: false, action: 'insertNewline', linesChanged: true };
+            }
+            case 'Backspace': {
+                if (pos.col > 0) {
+                    textBuffer.deleteRange(pos.line, pos.col - 1, pos.col);
+                    textBuffer.moveCursorRelative(0, -1);
+                } else if (pos.line > 0) {
+                    const prevLineLen = textBuffer.getLineLength(pos.line - 1);
+                    const currentLine = textBuffer.getLine(pos.line);
+                    textBuffer.lines[pos.line - 1] += currentLine;
+                    textBuffer.deleteLine(pos.line);
+                    textBuffer.moveCursor(pos.line - 1, prevLineLen);
+                }
+                return { moved: false, action: 'backspace', linesChanged: true };
+            }
+            case 'Delete': {
+                if (pos.col < textBuffer.getLineLength(pos.line)) {
+                    textBuffer.deleteRange(pos.line, pos.col, pos.col + 1);
+                } else if (pos.line < textBuffer.getLineCount() - 1) {
+                    const currentLine = textBuffer.getLine(pos.line);
+                    const nextLine = textBuffer.getLine(pos.line + 1);
+                    textBuffer.lines[pos.line] = currentLine + nextLine;
+                    textBuffer.deleteLine(pos.line + 1);
+                }
+                return { moved: false, action: 'delete', linesChanged: true };
+            }
+            case 'Tab': {
+                textBuffer.insertText(pos.line, pos.col, '    ');
+                return { moved: false, action: 'insertText', linesChanged: false };
+            }
+            default: {
+                // Insert printable character
+                if (key.length === 1 && key >= ' ') {
+                    textBuffer.insertText(pos.line, pos.col, key);
+                    return { moved: false, action: 'insertChar', linesChanged: false };
+                }
+                return { moved: false, unknown: key };
+            }
         }
     }
 

@@ -225,7 +225,8 @@ class TextBuffer {
 
     // Validation
     isComplete(target) {
-        return this.getCurrentText() === target;
+        const normalize = (s) => s.split('\n').map(l => l.trim()).join('\n');
+        return normalize(this.getCurrentText()) === normalize(target);
     }
 
     // Get character at position
