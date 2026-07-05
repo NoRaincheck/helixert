@@ -181,22 +181,19 @@ const Levels = [
     {
         id: 'w2-5',
         world: 2,
-        name: 'Route Master',
-        description: 'Combine counts, word hops, and gg to clear the maze',
-        commands: ['h', 'j', 'k', 'l', 'w', 'b', 'e', 'g'],
-        par: 5,
-        wizard: 4,
+        name: 'Kerb to Kerb',
+        description: 'g (goto) start of line and end of line (h/l)',
+        commands: ['h', 'j', 'k', 'l', 'g'],
+        par: 12,
+        wizard: 10,
         grid: {
             width: 10,
-            height: 6,
-            start: { x: 1, y: 1 },
+            height: 3,
+            start: { x: 0, y: 0 },
             tiles: [
-                '##########',
-                '#S..T..T.#',
-                '#........#',
-                '#.T......#',
-                '#......T.#',
-                '##########',
+                '...T..X..T',
+                '...T.X...T',
+                '...T...X.T',
             ]
         }
     },
