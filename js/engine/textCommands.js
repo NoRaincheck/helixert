@@ -30,6 +30,12 @@ class TextCommands {
         if (b === 'g' && this.buffer.length === 1) {
             return 'g → ?';
         }
+        if (b === 'm' && this.buffer.length === 1) {
+            return 'm → ?';
+        }
+        if (b === 'ms' || b === 'md' || b === 'mi' || b === 'ma') {
+            return b + ' → ?';
+        }
         return b;
     }
 
@@ -142,6 +148,7 @@ class TextCommands {
             }
             case 'y': this.buffer = ['y']; return { moved: false };
             case 'r': this.buffer = ['r']; return { moved: false };
+            case 'm': this.buffer = ['m']; return { moved: false };
 
             // Insert mode entry
             case 'i': {
@@ -382,6 +389,72 @@ class TextCommands {
                 default:
                     return { moved: false, unknown: key };
             }
+        }
+
+        // Handle 'm' prefix commands
+        if (prefix === 'm') {
+            if (key === 's' || key === 'd' || key === 'i' || key === 'a') {
+                this.buffer = ['m', key];
+                return { moved: false };
+            }
+            if (key === 'm') {
+                this.buffer = [];
+                return { moved: false, action: 'matchBracket' };
+            }
+            this.buffer = [];
+            return { moved: false, unknown: key };
+        }
+
+        // Handle 'mi' prefix (select inside text object)
+        if (prefix === 'mi') {
+            this.buffer = [];
+            if (key === 'w') {
+                // miw - select inside word
+                const wordStart = textBuffer.findWordStart(pos.line, pos.col, false);
+                const wordEnd = textBuffer.findWordEnd(pos.line, pos.col);
+                if (wordStart < wordEnd) {
+                    this.mode = 'SELECT';
+                    this.selectStart = { line: pos.line, col: wordStart };
+                    textBuffer.moveCursor(pos.line, wordEnd);
+                    return { moved: false, action: 'selectInside', linesChanged: false };
+                }
+                return { moved: false };
+            }
+            return { moved: false, unknown: key };
+        }
+
+        // Handle 'ma' prefix (select around text object)
+        if (prefix === 'ma') {
+            this.buffer = [];
+            if (key === 'w') {
+                // maw - select around word (including trailing space)
+                const wordStart = textBuffer.findWordStart(pos.line, pos.col, false);
+                let wordEnd = textBuffer.findWordEnd(pos.line, pos.col);
+                const line = textBuffer.getLine(pos.line);
+                if (wordEnd + 1 < line.length && line[wordEnd + 1] === ' ') {
+                    wordEnd++;
+                }
+                if (wordStart <= wordEnd) {
+                    this.mode = 'SELECT';
+                    this.selectStart = { line: pos.line, col: wordStart };
+                    textBuffer.moveCursor(pos.line, wordEnd);
+                    return { moved: false, action: 'selectAround', linesChanged: false };
+                }
+                return { moved: false };
+            }
+            return { moved: false, unknown: key };
+        }
+
+        // Handle 'ms' prefix (surround add)
+        if (prefix === 'ms') {
+            this.buffer = [];
+            return { moved: false, action: 'surroundAdd', char: key };
+        }
+
+        // Handle 'md' prefix (surround delete)
+        if (prefix === 'md') {
+            this.buffer = [];
+            return { moved: false, action: 'surroundDelete', char: key };
         }
 
         return { moved: false, unknown: key };
