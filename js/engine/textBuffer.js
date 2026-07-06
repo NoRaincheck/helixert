@@ -238,28 +238,36 @@ class TextBuffer {
     }
 
     // Word boundaries for word motions
+    static isWordChar(ch) {
+        return /[a-zA-Z0-9_]/.test(ch);
+    }
+
     findWordStart(lineNum, col, forward) {
         const line = this.lines[lineNum];
         if (!line) return col;
 
         if (forward) {
-            // Move to end of current word, then start of next word
             let i = col;
-            // Skip current word
-            if (i < line.length && line[i] !== ' ') {
-                while (i < line.length && line[i] !== ' ') i++;
+            // Skip current word (alphanumeric/underscore chars)
+            if (i < line.length && TextBuffer.isWordChar(line[i])) {
+                while (i < line.length && TextBuffer.isWordChar(line[i])) i++;
+            } else if (i < line.length) {
+                // Skip non-word, non-space chars (punctuation run)
+                while (i < line.length && !TextBuffer.isWordChar(line[i]) && line[i] !== ' ') i++;
             }
             // Skip spaces
             while (i < line.length && line[i] === ' ') i++;
             return i;
         } else {
-            // Move backward to start of current word or previous word
             let i = col;
             // Skip spaces
             while (i > 0 && line[i - 1] === ' ') i--;
             // Skip word
-            if (i > 0 && line[i - 1] !== ' ') {
-                while (i > 0 && line[i - 1] !== ' ') i--;
+            if (i > 0 && TextBuffer.isWordChar(line[i - 1])) {
+                while (i > 0 && TextBuffer.isWordChar(line[i - 1])) i--;
+            } else if (i > 0) {
+                // Skip non-word, non-space chars backward
+                while (i > 0 && !TextBuffer.isWordChar(line[i - 1]) && line[i - 1] !== ' ') i--;
             }
             return i;
         }
@@ -273,8 +281,11 @@ class TextBuffer {
         // Skip spaces
         while (i < line.length && line[i] === ' ') i++;
         // Move to end of word
-        if (i < line.length && line[i] !== ' ') {
-            while (i < line.length - 1 && line[i + 1] !== ' ') i++;
+        if (i < line.length && TextBuffer.isWordChar(line[i])) {
+            while (i < line.length - 1 && TextBuffer.isWordChar(line[i + 1])) i++;
+        } else if (i < line.length) {
+            // End of punctuation run
+            while (i < line.length - 1 && !TextBuffer.isWordChar(line[i + 1]) && line[i + 1] !== ' ') i++;
         }
         return i;
     }

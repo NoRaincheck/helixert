@@ -437,5 +437,28 @@ class TextEditScene extends Phaser.Scene {
                 });
             }
         });
+
+        // Separate Enter handler — Phaser's generic keydown may not fire for Enter
+        this.input.keyboard.on('keydown-ENTER', (event) => {
+            if (this.textCommands.getMode() !== 'INSERT') return;
+            event.preventDefault();
+            const result = this.textCommands.execute('Enter', this.textBuffer);
+            if (result.unknown) return;
+            this.keystrokeCount++;
+            this.commandLog.push('Enter');
+            this.renderText();
+            this.updateHUD();
+            if (this.textBuffer.isComplete(this.levelData.target)) {
+                this.time.delayedCall(300, () => {
+                    this.scene.start('ResultScene', {
+                        levelId: this.levelId,
+                        worldNum: this.worldNum,
+                        keystrokes: this.keystrokeCount,
+                        par: this.levelData.par,
+                        wizard: this.levelData.wizard
+                    });
+                });
+            }
+        });
     }
 }

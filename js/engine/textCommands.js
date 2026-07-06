@@ -601,7 +601,8 @@ class TextCommands {
                 this.mode = 'NORMAL';
                 return { moved: false, action: 'normalMode' };
             }
-            case 'Enter': {
+            case 'Enter':
+            case 13: {
                 // Split current line at cursor
                 const line = textBuffer.getLine(pos.line);
                 const before = line.substring(0, pos.col);
