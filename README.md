@@ -1,67 +1,77 @@
 # Helixert
 
-A browser-based game that teaches [Helix editor](https://helix-editor.com/) keybindings through maze navigation, inspired by [VimScoops](https://vimscoops.dev/game).
+A browser-based game that teaches [Helix editor](https://helix-editor.com/) keybindings through 16 focused levels. Helix uses **noun-verb** semantics — you select text first, then operate on it.
+
+Inspired by [vimMaster](https://github.com/renzorlive/vimmaster).
 
 ## How to Play
 
-1. Open `index.html` in your browser (or visit the GitHub Pages URL)
-2. Browse worlds and select a level
-3. Use Helix keybindings to navigate the van through the maze
-4. Collect all food items to complete the level
-5. Match the keystroke par to earn Wizard rank!
-
-## Helix Keybindings Taught
-
-### World 1: First Steps (Basic Movement)
-- `h j k l` - Move left, down, up, right
-- `w b e` - Word movement
-- `W B E` - WORD movement
-- `0 $ ^` - Line positions
-
-### World 2: Character Hunt (Find & Till)
-- `f <char>` - Find character forward
-- `F <char>` - Find character backward
-- `t <char>` - Till character forward
-- `T <char>` - Till character backward
-- `; ,` - Repeat find motions
-
-### World 3: Scoops & Dops (Editing)
-- `r <char>` - Replace character
-- `d` - Delete
-- `c` - Change
-- `x` - Select line
-- `u U` - Undo/redo
-
-### World 4: Selection Station
-- `v` - Visual selection mode
-- `;` - Collapse selection
-- `%` - Select all
-
-### World 5: Goto Galaxy
-- `g g` - Go to file start
-- `g e` - Go to file end
-- `g h` - Go to line start
-- `g l` - Go to line end
-- `g f` - Go to floor mark
-
-## Testing
-
-Tests use [Deno](https://deno.land/) with its built-in test runner.
-
 ```sh
-deno test --no-check js/engine/helixCommands.test.js
+# With Deno
+deno task dev
+# Then open http://localhost:3000
 ```
 
-## GitHub Pages Deployment
+Or serve statically with any HTTP server (ES6 modules require a server, not `file://`).
 
-1. Push this repository to GitHub
-2. Go to Settings > Pages
-3. Select "Deploy from a branch"
-4. Choose `main` branch and `/ (root)` folder
-5. Save - your game will be live at `https://<username>.github.io/<repo-name>/`
+## What You'll Learn
+
+| Level | Name | Commands |
+|-------|------|----------|
+| 1 | How to Exit | `:q`, `:wq` |
+| 2 | Basic Movement | `h`, `j`, `k`, `l` |
+| 3 | Word Movement | `w`, `b`, `e` |
+| 4 | Line Jumps | `gg`, `ge` |
+| 5 | Line Bounds | `0`, `$`, `^` |
+| 6 | Select a Line | `x` (select line) |
+| 7 | Delete Selection | `x` → `d` |
+| 8 | Select & Delete Word | `w` → `d` |
+| 9 | Yank & Paste | `x` → `y`, then `p` |
+| 10 | Find Character | `f{char}` |
+| 11 | Insert Mode | `a`, `Esc` |
+| 12 | Append & Open Lines | `o`, `O` |
+| 13 | Change Selection | `x`/`v` → `c` |
+| 14 | Undo & Redo | `u` |
+| 15 | Counts | `3w` |
+| 16 | Replace Character | `r{char}` |
+
+## Helix vs Vim
+
+Helix uses **noun-verb** order (opposite of Vim):
+
+| Vim (verb-noun) | Helix (noun-verb) |
+|-----------------|-------------------|
+| `dd` delete line | `x` select → `d` delete |
+| `dw` delete word | `w` move → `d` delete |
+| `yy` yank line | `x` select → `y` yank |
+| `ciw` change word | `v` select → `c` change |
+
+## Tech Stack
+
+- Vanilla HTML/CSS/JavaScript (ES6 modules)
+- Tailwind CSS (CDN)
+- Deno for development server
+- No frameworks, no build step
+
+## Project Structure
+
+```
+helixert/
+├── index.html              # Entry point
+├── css/main.css            # Styles
+├── js/
+│   ├── main.js             # Entry point, event binding
+│   ├── gameState.js        # Centralized state
+│   ├── helixCommands.js    # Helix command engine
+│   ├── textBuffer.js       # Text buffer model
+│   ├── levels.js           # 16 level definitions
+│   ├── ui-components.js    # DOM rendering
+│   ├── event-handlers.js   # Game logic
+│   └── progress-system.js  # localStorage persistence
+└── deno.json               # Deno tasks
+```
 
 ## Credits
 
-- Game engine: [Phaser 3](https://phaser.io/)
-- Sprites: [OpenMoji](https://openmoji.org/) (CC BY-SA 4.0)
-- Inspired by: [VimScoops](https://vimscoops.dev/game)
+- Inspired by: [vimMaster](https://github.com/renzorlive/vimmaster), [VimScoops](https://vimscoops.dev/game)
+- Helix editor: [helix-editor.com](https://helix-editor.com/)
