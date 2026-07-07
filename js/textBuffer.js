@@ -161,6 +161,22 @@ export function findWordEnd(row, col) {
 
     const newLine = content[r];
 
+    // Advance past current position to avoid finding same word
+    c++;
+
+    // If past end of line, advance to next line
+    if (c >= newLine.length) {
+        if (r < content.length - 1) {
+            r++;
+            c = 0;
+            const nextLine = content[r];
+            // Skip whitespace on new line
+            while (c < nextLine.length && /\s/.test(nextLine[c])) c++;
+            return { row: r, col: Math.min(c, nextLine.length > 0 ? nextLine.length - 1 : 0) };
+        }
+        return { row: r, col: newLine.length > 0 ? newLine.length - 1 : 0 };
+    }
+
     // Skip whitespace forward
     while (c < newLine.length && /\s/.test(newLine[c])) c++;
 
@@ -178,7 +194,15 @@ export function findWordEnd(row, col) {
 export function deleteLine(row) {
     const content = getContent();
     if (row < 0 || row >= content.length) return '';
-    return content.splice(row, 1)[0];
+    if (content.length <= 1) {
+        const line = content[0];
+        content[0] = '';
+        setContent(content);
+        return line;
+    }
+    const deleted = content.splice(row, 1)[0];
+    setContent(content);
+    return deleted;
 }
 
 export function deleteToLineEnd(row, col) {
@@ -187,6 +211,7 @@ export function deleteToLineEnd(row, col) {
     const line = content[row];
     const deleted = line.slice(col);
     content[row] = line.slice(0, col);
+    setContent(content);
     return deleted;
 }
 
@@ -194,8 +219,15 @@ export function deleteRange(startRow, startCol, endRow, endCol) {
     const content = getContent();
     if (startRow === endRow) {
         const line = content[startRow];
+        // Full line selected — remove it entirely (keep at least one line)
+        if (startCol === 0 && endCol >= line.length && content.length > 1) {
+            const deleted = content.splice(startRow, 1)[0];
+            setContent(content);
+            return deleted;
+        }
         const deleted = line.slice(startCol, endCol);
         content[startRow] = line.slice(0, startCol) + line.slice(endCol);
+        setContent(content);
         return deleted;
     }
 
@@ -210,6 +242,7 @@ export function deleteRange(startRow, startCol, endRow, endCol) {
     // Remove lines from end to start
     for (let i = endRow; i > startRow; i--) content.splice(i, 1);
     content[startRow] = newLine;
+    setContent(content);
 
     return deleted;
 }
@@ -231,6 +264,7 @@ export function insertText(row, col, text) {
     const content = getContent();
     const line = content[row];
     content[row] = line.slice(0, col) + text + line.slice(col);
+    setContent(content);
 }
 
 export function pasteAfter(text) {
@@ -243,6 +277,7 @@ export function pasteAfter(text) {
         const line = content[cursor.row];
         const insertCol = Math.min(cursor.col + 1, line.length);
         content[cursor.row] = line.slice(0, insertCol) + text + line.slice(insertCol);
+        setContent(content);
         setCursorCol(insertCol + text.length - 1);
     } else {
         // Multi-line paste: insert lines after current line
@@ -254,6 +289,7 @@ export function pasteAfter(text) {
             content.splice(cursor.row + 1 + i, 0, lines[i]);
         }
         content[cursor.row + lines.length] += afterCursor;
+        setContent(content);
 
         setCursorRow(cursor.row + lines.length);
         setCursorCol(lines[lines.length - 1].length > 0 ? lines[lines.length - 1].length - 1 : 0);

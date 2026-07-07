@@ -87,9 +87,15 @@ function executeSingle(key, e) {
     if ('hjk'.includes(key)) {
         const count = getCount();
         for (let i = 0; i < count; i++) {
-            if (key === 'h') tb.moveCursorRelative(0, -1);
-            else if (key === 'j') tb.moveCursorRelative(1, 0);
-            else if (key === 'k') tb.moveCursorRelative(-1, 0);
+            if (key === 'h') {
+                tb.moveCursorRelative(0, -1);
+                gs.setDesiredCol(gs.getCursor().col);
+            } else if (key === 'j' || key === 'k') {
+                tb.moveCursorRelative(key === 'j' ? 1 : -1, 0);
+                const c = gs.getCursor();
+                const maxCol = Math.max(0, tb.getLineLength(c.row) - 1);
+                gs.setCursor({ row: c.row, col: Math.min(gs.getDesiredCol(), maxCol) });
+            }
         }
         resetCount();
         gs.clearCommandLog();
@@ -109,6 +115,7 @@ function executeSingle(key, e) {
                 tb.moveCursor(c.row + 1, 0);
             }
         }
+        gs.setDesiredCol(gs.getCursor().col);
         resetCount();
         gs.clearCommandLog();
         return { handled: true, moved: true };
@@ -122,6 +129,7 @@ function executeSingle(key, e) {
             const next = tb.findWordForward(c.row, c.col);
             tb.moveCursor(next.row, next.col);
         }
+        gs.setDesiredCol(gs.getCursor().col);
         resetCount();
         gs.clearCommandLog();
         return { handled: true, moved: true };
@@ -134,6 +142,7 @@ function executeSingle(key, e) {
             const prev = tb.findWordBackward(c.row, c.col);
             tb.moveCursor(prev.row, prev.col);
         }
+        gs.setDesiredCol(gs.getCursor().col);
         resetCount();
         gs.clearCommandLog();
         return { handled: true, moved: true };
@@ -146,28 +155,14 @@ function executeSingle(key, e) {
             const end = tb.findWordEnd(c.row, c.col);
             tb.moveCursor(end.row, end.col);
         }
+        gs.setDesiredCol(gs.getCursor().col);
         resetCount();
         gs.clearCommandLog();
         return { handled: true, moved: true };
     }
 
     // --- Line position ---
-    if (key === '0') { tb.moveCursor(gs.getCursor().row, 0); resetCount(); gs.clearCommandLog(); return { handled: true, moved: true }; }
-    if (key === '$') {
-        const c = gs.getCursor();
-        const len = tb.getLineLength(c.row);
-        tb.moveCursor(c.row, Math.max(0, len - 1));
-        resetCount(); gs.clearCommandLog();
-        return { handled: true, moved: true };
-    }
-    if (key === '^') {
-        const c = gs.getCursor();
-        const line = tb.getLine(c.row);
-        const firstNonBlank = line.search(/\S/);
-        tb.moveCursor(c.row, firstNonBlank >= 0 ? firstNonBlank : 0);
-        resetCount(); gs.clearCommandLog();
-        return { handled: true, moved: true };
-    }
+    if (key === '0') { tb.moveCursor(gs.getCursor().row, 0); gs.setDesiredCol(0); resetCount(); gs.clearCommandLog(); return { handled: true, moved: true }; }
 
     // --- Goto mode (g prefix) ---
     if (key === 'g') {
@@ -561,7 +556,17 @@ function executeSelect(key, e) {
         const [dr, dc] = movementKeys[key];
         const count = getCount();
         for (let i = 0; i < count; i++) {
-            tb.moveCursorRelative(dr, dc);
+            if (key === 'j' || key === 'k') {
+                tb.moveCursorRelative(dr, dc);
+                const c = gs.getCursor();
+                const maxCol = Math.max(0, tb.getLineLength(c.row) - 1);
+                gs.setCursor({ row: c.row, col: Math.min(gs.getDesiredCol(), maxCol) });
+            } else {
+                tb.moveCursorRelative(dr, dc);
+            }
+        }
+        if (key !== 'j' && key !== 'k') {
+            gs.setDesiredCol(gs.getCursor().col);
         }
         gs.setSelectEnd(gs.getCursor());
         resetCount();
@@ -600,22 +605,6 @@ function executeSelect(key, e) {
 
     // Line position in SELECT mode
     if (key === '0') { tb.moveCursor(gs.getCursor().row, 0); gs.setSelectEnd(gs.getCursor()); gs.clearCommandLog(); return { handled: true, selectionExtended: true }; }
-    if (key === '$') {
-        const c = gs.getCursor();
-        tb.moveCursor(c.row, Math.max(0, tb.getLineLength(c.row) - 1));
-        gs.setSelectEnd(gs.getCursor());
-        gs.clearCommandLog();
-        return { handled: true, selectionExtended: true };
-    }
-    if (key === '^') {
-        const c = gs.getCursor();
-        const line = tb.getLine(c.row);
-        const firstNonBlank = line.search(/\S/);
-        tb.moveCursor(c.row, firstNonBlank >= 0 ? firstNonBlank : 0);
-        gs.setSelectEnd(gs.getCursor());
-        gs.clearCommandLog();
-        return { handled: true, selectionExtended: true };
-    }
 
     // Operators in SELECT mode
     if ('dyc'.includes(key)) {

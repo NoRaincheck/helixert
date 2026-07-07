@@ -15,7 +15,7 @@ export const worlds = [
         description: 'Advanced Movement',
         icon: '🧭',
         color: '#f7a41d',
-        commands: ['w', 'b', 'e', '0', '$', '^', 'g', 'G'],
+        commands: ['w', 'b', 'e', '0', 'g', 'G'],
     },
     {
         num: 2,

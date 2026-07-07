@@ -19,6 +19,7 @@ let _searchMatches = [];
 let _currentMatchIndex = -1;
 let _usedSearchInLevel = false;
 let _navCountSinceSearch = 0;
+let _desiredCol = 0; // Vim-style curswant: column for vertical movement
 
 // Selection state (Helix noun-verb: selection is the "noun")
 let _selectStart = null; // { row, col } — where selection began
@@ -55,7 +56,9 @@ export const getSelectEnd = () => _selectEnd ? { ..._selectEnd } : null;
 export const getUsedSelectLine = () => _usedSelectLine;
 export const getUsedSelectMode = () => _usedSelectMode;
 export const getUsedInsertMode = () => _usedInsertMode;
+export const getUsedSearch = () => _usedSearch;
 export const getUsedFindChar = () => _usedFindChar;
+export const getDesiredCol = () => _desiredCol;
 
 // --- Setters ---
 export const setContent = (c) => { _content = [...c]; };
@@ -82,7 +85,9 @@ export const setSelectEnd = (e) => { _selectEnd = e ? { ...e } : null; };
 export const setUsedSelectLine = (v) => { _usedSelectLine = v; };
 export const setUsedSelectMode = (v) => { _usedSelectMode = v; };
 export const setUsedInsertMode = (v) => { _usedInsertMode = v; };
+export const setUsedSearch = (v) => { _usedSearch = v; };
 export const setUsedFindChar = (v) => { _usedFindChar = v; };
+export const setDesiredCol = (v) => { _desiredCol = v; };
 
 // --- Content manipulation ---
 export const updateContentLine = (row, newLine) => {
@@ -155,6 +160,7 @@ export const resetLevelState = () => {
     _searchMatches = [];
     _currentMatchIndex = -1;
     _usedSearchInLevel = false;
+    _usedSearch = false;
     _navCountSinceSearch = 0;
     _selectStart = null;
     _selectEnd = null;
