@@ -6,75 +6,75 @@
     <title>Helixert — Learn Helix Keybindings</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-200 min-h-screen p-4">
+<body>
     <div class="w-full max-w-5xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-6">
-            <pre class="text-cyan-400 text-center text-xs md:text-sm font-mono ascii-logo mb-2">▗▖ ▗▖▗▄▄▄▖▗▖   ▗▄▄▄▖▗▖  ▗▖▗▄▄▄▖▗▄▄▖▗▄▄▄▖
+            <pre class="ascii-logo">▗▖ ▗▖▗▄▄▄▖▗▖   ▗▄▄▄▖▗▖  ▗▖▗▄▄▄▖▗▄▄▖▗▄▄▄▖
 ▐▌ ▐▌▐▌   ▐▌     █   ▝▚▞▘ ▐▌   ▐▌ ▐▌ █  
 ▐▛▀▜▌▐▛▀▀▘▐▌     █    ▐▌  ▐▛▀▀▘▐▛▀▚▖ █  
 ▐▌ ▐▌▐▙▄▄▖▐▙▄▄▖▗▄█▄▖▗▞▘▝▚▖▐▙▄▄▖▐▌ ▐▌ █  
             </pre>
-            <p class="text-gray-400 text-sm">Master Helix-style modal editing through focused levels</p>
+            <p class="text-sm text-overlay0">Master Helix-style modal editing through focused levels</p>
         </div>
 
         <!-- Instructions -->
-        <div class="bg-gradient-to-r from-cyan-900/50 to-blue-900/50 rounded-xl p-4 mb-4 border border-cyan-700/50 backdrop-blur-sm">
-            <p id="instructions" class="text-lg text-center text-cyan-100 font-medium">Welcome! Let's learn Helix together.</p>
+        <div class="instructions-box">
+            <p id="instructions" class="text-lg text-center text-sky font-medium">Welcome! Let's learn Helix together.</p>
         </div>
 
         <!-- Main Editor -->
-        <div id="editor-container" class="bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d] rounded-xl shadow-2xl p-6 border border-gray-600/50 relative backdrop-blur-sm">
+        <div id="editor-container" class="editor-wrapper">
             <div class="flex items-center justify-between mb-4">
-                <div class="text-gray-400 text-sm font-medium">Helix Editor</div>
-                <div class="text-gray-500 text-xs">
-                    <kbd class="bg-gray-700 px-2 py-1 rounded">Esc</kbd> Normal mode
+                <div class="text-sm text-overlay1 font-medium">Helix Editor</div>
+                <div class="editor-hint">
+                    <kbd>Esc</kbd> Normal mode
                     &middot;
-                    <kbd class="bg-gray-700 px-2 py-1 rounded">v</kbd> Select mode
+                    <kbd>v</kbd> Select mode
                 </div>
             </div>
-            <div id="editor-display" class="editor-display text-lg min-h-[200px] bg-[#1e1e1e] rounded-lg p-4 border border-gray-700/50 font-mono leading-relaxed"></div>
+            <div id="editor-display" class="editor-display"></div>
             <textarea id="editor-input" class="absolute top-0 left-0 w-full h-full opacity-0 cursor-default" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
 
             <!-- Status Bar -->
             <div class="flex flex-col md:flex-row justify-between items-center mt-4 gap-2">
-                <div id="status-bar" class="status-bar px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm uppercase font-bold shadow-lg">
+                <div id="status-bar" class="status-bar mode-normal">
                     -- NORMAL --
                 </div>
-                <div id="command-log" class="text-gray-400 text-sm font-mono bg-gray-800/50 px-3 py-2 rounded-lg border border-gray-700/50"></div>
+                <div id="command-log" class="command-log"></div>
             </div>
         </div>
 
         <!-- Level Controls -->
         <div class="flex flex-col md:flex-row justify-center items-center mt-4 gap-4">
-            <div id="level-indicator" class="text-gray-400 font-semibold text-lg"></div>
-            <button id="reset-btn" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-gray-200 hover:text-white font-bold py-2 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
+            <div id="level-indicator" class="text-overlay1 font-semibold text-lg"></div>
+            <button id="reset-btn" class="btn-reset">
                 Reset Level
             </button>
         </div>
 
         <!-- World Tabs -->
-        <div id="world-tabs" class="flex justify-center flex-wrap gap-2 mt-4 mb-3"></div>
+        <div id="world-tabs"></div>
 
         <!-- Level Selection -->
-        <div id="level-selection" class="flex justify-center flex-wrap gap-3 mt-2 mb-4"></div>
+        <div id="level-selection"></div>
 
         <!-- Footer -->
-        <footer class="text-center py-6 border-t border-gray-600/30 mt-4">
-            <p class="text-gray-500 text-sm">
-                Helixert — Learn <a href="https://helix-editor.com" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-colors">Helix</a> keybindings
+        <footer class="footer">
+            <p class="text-sm text-overlay0">
+                Helixert — Learn <a href="https://helix-editor.com" target="_blank">Helix</a> keybindings
                 &middot;
-                <a href="https://github.com" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-colors">Source</a>
+                <a href="https://github.com" target="_blank">Source</a>
             </p>
         </footer>
     </div>
 
     <!-- Modal -->
     <div id="modal" class="fixed inset-0 flex items-center justify-center modal-bg opacity-0 pointer-events-none z-50">
-        <div id="modal-content" class="bg-gradient-to-br from-gray-800 to-gray-900 text-white p-8 rounded-2xl shadow-2xl max-w-md text-center transform scale-95 border border-gray-600/50 backdrop-blur-sm">
-            <h2 id="modal-title" class="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Level Complete!</h2>
-            <div id="modal-message" class="mb-6 text-gray-300"></div>
-            <button id="next-level-btn" class="bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-500 hover:to-blue-500 text-gray-900 font-bold py-3 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+        <div id="modal-content" class="modal-content">
+            <h2 id="modal-title" class="modal-title">Level Complete!</h2>
+            <div id="modal-message" class="modal-message"></div>
+            <button id="next-level-btn" class="btn-primary">
                 Next Level
             </button>
         </div>
@@ -84,11 +84,11 @@
     <div id="celebration" class="fixed inset-0 hidden z-50 flex items-center justify-center">
         <div class="celebration-overlay"></div>
         <div class="text-center px-6 relative z-10">
-            <div class="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 mb-6">
+            <div class="celebration-title">
                 MASTERED!
             </div>
-            <div class="text-xl md:text-3xl text-blue-100 mb-8 font-medium">You've conquered all Helix basics!</div>
-            <button id="celebration-restart" class="bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-500 hover:to-blue-500 text-gray-900 font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-2xl text-lg">
+            <div class="celebration-text">You've conquered all Helix basics!</div>
+            <button id="celebration-restart" class="btn-primary-lg">
                 Play Again
             </button>
         </div>

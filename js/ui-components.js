@@ -125,14 +125,8 @@ export function updateStatusBar(mode, countBuffer, commandLog, searchMode, searc
 
     statusBar.textContent = text;
 
-    statusBar.className = 'status-bar px-4 py-2 rounded-lg text-sm uppercase font-bold shadow-lg ';
-    if (mode === 'NORMAL') {
-        statusBar.className += 'bg-yellow-400 text-gray-900';
-    } else if (mode === 'SELECT') {
-        statusBar.className += 'bg-cyan-400 text-gray-900';
-    } else if (mode === 'INSERT') {
-        statusBar.className += 'bg-green-400 text-gray-900';
-    }
+    statusBar.className = 'status-bar';
+    statusBar.classList.add(`mode-${mode.toLowerCase()}`);
 }
 
 // --- Instructions ---
@@ -166,13 +160,10 @@ export function createWorldTabs(currentWorld, completedLevelsByWorld, onWorldCli
         const total = 5; // All worlds have 5 levels
         const isCurrent = world.num === currentWorld;
 
-        btn.innerHTML = `<span class="mr-1">${world.icon}</span> ${world.name}`;
-        btn.className = `px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 `;
+        btn.innerHTML = `<span>${world.icon}</span> ${world.name}`;
         if (isCurrent) {
-            btn.className += 'text-white shadow-lg scale-105';
+            btn.className = 'world-tab-current';
             btn.style.backgroundColor = world.color;
-        } else {
-            btn.className += 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white';
         }
 
         btn.title = `${world.description} (${completed}/${total} completed)`;

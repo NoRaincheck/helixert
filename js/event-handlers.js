@@ -118,7 +118,7 @@ export function checkWinCondition() {
                     showModal(
                         `World ${_currentWorld} Complete!`,
                         `You've mastered: <strong>${worlds[_currentWorld].name}</strong>!<br><br>
-                        <button id="next-world-btn" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded mt-2">
+                        <button id="next-world-btn" class="btn-next-world">
                             Next World: ${worlds[_currentWorld + 1].name}
                         </button>`
                     );
