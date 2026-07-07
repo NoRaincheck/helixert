@@ -1,0 +1,24 @@
+{
+  "name": "helixert",
+  "version": "1.0.0",
+  "description": "A browser-based game that teaches [Helix editor](https://helix-editor.com/) keybindings through 16 focused levels. Helix uses **noun-verb** semantics — you select text first, then operate on it.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NoRaincheck/helixert.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/NoRaincheck/helixert/issues"
+  },
+  "homepage": "https://github.com/NoRaincheck/helixert#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  }
+}

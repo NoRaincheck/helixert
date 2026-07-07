@@ -6,6 +6,8 @@ This game uses **Helix-style** keybindings, NOT standard Vim. Helix uses **noun-
 
 **WARNING: `dd` is NOT a valid Helix command. Never use or reference `dd` in code, tests, or level descriptions.**
 
+**WARNING: `$` and `^` are NOT valid Helix commands. They are Vim motions. Never use them in code, tests, or level descriptions.** In real Helix, end-of-line and first-non-blank are accessed differently.
+
 ### Command order
 
 | Mode | Vim (verb-noun) | Helix (noun-verb) |
