@@ -1,7 +1,7 @@
 {
   "tasks": {
     "dev": "deno run --allow-net --allow-read server.ts",
-    "test": "deno test js/",
+    "test": "deno test --permit-no-files js/",
     "test:ui": "npx playwright test"
   }
 }
