@@ -7,7 +7,7 @@ export const worlds = [
         description: 'Basic Movement',
         icon: '的脚步',
         color: '#4ecdc4',
-        commands: ['h', 'j', 'k', 'l'],
+        commands: ['h', 'j', 'k', 'l', 'g'],
     },
     {
         num: 1,

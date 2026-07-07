@@ -36,14 +36,14 @@ export const levels = [
     {
         world: 0,
         name: 'The Long Street',
-        instructions: 'Use <kbd class="kbd">0</kbd> to jump to line start, <kbd class="kbd">$</kbd> to jump to line end. Navigate to the end of the first line.',
+        instructions: 'Use <kbd class="kbd">g</kbd><kbd class="kbd">h</kbd> to jump to line start, <kbd class="kbd">g</kbd><kbd class="kbd">l</kbd> to jump to line end. Navigate to the end of the first line.',
         initialContent: [
             'Jump to the start and end of this line.',
             'Practice makes perfect.'
         ],
         target: { row: 0, col: 38 },
         setup: (s) => { s.cursor = { row: 0, col: 0 }; },
-        commands: ['0', '$'],
+        commands: ['g', 'h', 'l'],
         par: 4, wizard: 2,
     },
     {
@@ -76,16 +76,16 @@ export const levels = [
         name: 'Rush Hour',
         instructions: 'Big file! Use counts like <kbd class="kbd">3j</kbd> to cover ground fast.',
         initialContent: [
-            'Line 1 — start here',
+            'Line 1 - start here',
             'Line 2',
             'Line 3',
-            'Line 4 — target!',
+            'Line 4 - target!',
             'Line 5',
             'Line 6',
             'Line 7',
-            'Line 8 — end',
+            'Line 8 - end',
         ],
-        target: { row: 3, col: 14 },
+        target: { row: 3, col: 15 },
         setup: (s) => { s.cursor = { row: 0, col: 0 }; },
         commands: ['j', 'k', '3'],
         par: 4, wizard: 2,
@@ -145,7 +145,7 @@ export const levels = [
             'six seven eight nine ten',
             'TARGET is on this line',
         ],
-        target: { row: 2, col: 11 },
+        target: { row: 2, col: 21 },
         setup: (s) => { s.cursor = { row: 0, col: 0 }; },
         commands: ['w', 'ge'],
         par: 5, wizard: 3,
@@ -227,7 +227,7 @@ export const levels = [
     {
         world: 2,
         name: 'Fix the Chocolate',
-        instructions: 'Move to the unwanted characters and delete them. Use <kbd class="kbd">x</kbd> to select, <kbd class="kbd">d</kbd> to delete.',
+        instructions: 'Move to each <kbd class="kbd">!</kbd> and press <kbd class="kbd">d</kbd> to delete it.',
         initialContent: [
             'choc!!!!olate',
             'strawberry',
@@ -237,7 +237,7 @@ export const levels = [
             'strawberry',
         ],
         setup: (s) => { s.cursor = { row: 0, col: 4 }; },
-        commands: ['x', 'd'],
+        commands: ['h', 'l', 'd'],
         par: 5, wizard: 3,
     },
     {

@@ -399,6 +399,25 @@ function executeBuffered(key, e) {
             gs.clearCommandLog();
             return { handled: true, moved: true };
         }
+        if (key === 'h') {
+            // gh — go to line start (first non-blank)
+            const line = tb.getLine(gs.getCursor().row);
+            const firstNonBlank = line.search(/\S/);
+            tb.moveCursor(gs.getCursor().row, firstNonBlank >= 0 ? firstNonBlank : 0);
+            gs.setDesiredCol(gs.getCursor().col);
+            _buffer = [];
+            gs.clearCommandLog();
+            return { handled: true, moved: true };
+        }
+        if (key === 'l') {
+            // gl — go to line end
+            const row = gs.getCursor().row;
+            tb.moveCursor(row, Math.max(0, tb.getLineLength(row) - 1));
+            gs.setDesiredCol(gs.getCursor().col);
+            _buffer = [];
+            gs.clearCommandLog();
+            return { handled: true, moved: true };
+        }
         // Unknown g command — discard
         _buffer = [];
         gs.clearCommandLog();
@@ -442,8 +461,21 @@ function executeBuffered(key, e) {
 function executeOperator(op) {
     const sel = gs.getSelectionRange();
     if (!sel) {
-        // No selection — in Helix, operators without selection do nothing special
-        // except we can handle edge cases here
+        if (op === 'd') {
+            const cursor = gs.getCursor();
+            const content = gs.getContent();
+            const line = content[cursor.row] || '';
+            if (cursor.col < line.length) {
+                gs.pushUndo();
+                content[cursor.row] = line.slice(0, cursor.col) + line.slice(cursor.col + 1);
+                gs.setContent(content);
+                tb.clampCursor();
+                _lastChange = { type: 'delete-char', pos: { ...cursor } };
+            }
+            resetCount();
+            gs.clearCommandLog();
+            return { handled: true, operated: 'd' };
+        }
         gs.clearCommandLog();
         return { handled: true };
     }

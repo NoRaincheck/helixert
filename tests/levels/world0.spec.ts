@@ -18,13 +18,14 @@ test.describe('World 0 — Basic Movement', () => {
     expect(pos.col).toBe(9);
   });
 
-  test('0-1 The Long Street: 0 goes to line start', async ({ page }) => {
+  test('0-1 The Long Street: gh goes to line start, gl to line end', async ({ page }) => {
     await goToLevel(page, 1);
     await page.locator('#editor-input').focus();
-    await pressKeys(page, ['l', 'l', 'l', '0']);
+    // gl goes to end of line — col 38 is the target
+    await pressKeys(page, ['g', 'l']);
     const pos = await getCursorPos(page);
     expect(pos.row).toBe(0);
-    expect(pos.col).toBe(0);
+    expect(pos.col).toBe(38);
   });
 
   test('0-2 Hop the Blocks: w moves forward by word', async ({ page }) => {
