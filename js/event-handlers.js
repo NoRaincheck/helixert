@@ -24,7 +24,7 @@ export function getCurrentWorld() {
 
 export function loadSavedProgress() {
     const progress = getProgress();
-    _completedLevels = new Set(progress.completedLevels || []);
+    _completedLevels = new Set(Array.isArray(progress.completedLevels) ? progress.completedLevels : []);
     _currentWorld = progress.currentWorld || 0;
 }
 

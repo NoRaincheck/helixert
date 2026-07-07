@@ -1,10 +1,5 @@
 // Helixert — Main Entry Point
 
-// Load Tailwind CSS from CDN (before DOM to avoid FOUC)
-const tw = document.createElement('script');
-tw.src = 'https://cdn.tailwindcss.com';
-document.head.appendChild(tw);
-
 import * as gs from './gameState.js';
 import * as hc from './helixCommands.js';
 import { initializeDOM, hideModal, hideCelebration } from './ui-components.js';
