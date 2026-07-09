@@ -79,6 +79,8 @@ kbd {
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
 .flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1 1 0%; }
+.min-w-0 { min-width: 0; }
 .items-center { align-items: center; }
 .justify-center { justify-content: center; }
 .justify-between { justify-content: space-between; }
@@ -249,6 +251,12 @@ kbd {
   backdrop-filter: blur(4px);
 }
 
+.editor-column {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
 .editor-wrapper {
   background-image: linear-gradient(to bottom right, var(--mantle), var(--surface0));
   border-radius: 0.75rem;
@@ -265,6 +273,7 @@ kbd {
   overflow-x: auto;
   tab-size: 4;
   font-size: 1.125rem;
+  flex: 1;
   min-height: 200px;
   background-color: var(--mantle);
   border-radius: 0.5rem;
@@ -397,20 +406,20 @@ kbd {
 }
 
 .btn-reset {
-  font-weight: 700;
+  font-weight: 600;
   border: none;
-  padding: 0.5rem 1.5rem;
-  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3), 0 4px 6px -2px rgba(0,0,0,0.2);
   background-image: linear-gradient(to right, var(--surface1), var(--surface2));
   color: var(--subtext1);
+  white-space: nowrap;
 }
 
 .btn-reset:hover {
   background-image: linear-gradient(to right, var(--surface2), var(--surface1));
   color: var(--text);
-  transform: scale(1.05);
 }
 
 .btn-primary {
@@ -503,6 +512,8 @@ kbd {
   font-weight: 700;
   transition: all 0.15s ease;
   border: none;
+  background-color: var(--surface0);
+  color: var(--surface2);
 }
 
 .level-btn:hover {
@@ -510,8 +521,7 @@ kbd {
 }
 
 .level-btn.completed {
-  background-color: var(--green);
-  color: var(--crust);
+  border: 2px solid color-mix(in srgb, var(--green) 50%, transparent);
 }
 
 .level-btn.current {
