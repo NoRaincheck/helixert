@@ -5,7 +5,7 @@ export const worlds = [
         num: 0,
         name: 'First Steps',
         description: 'Basic Movement',
-        icon: '的脚步',
+        icon: '👣',
         color: '#4ecdc4',
         commands: ['h', 'j', 'k', 'l', 'g'],
     },
