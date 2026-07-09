@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { goToLevel, pressKeys, getCursorPos } from '../helpers';
+import { goToLevel, goToWorld, pressKeys, getCursorPos, getMode, getLevelIndicator } from '../helpers';
 
 test.describe('World 0 — Basic Movement', () => {
   test.beforeEach(async ({ page }) => {
@@ -57,5 +57,65 @@ test.describe('World 0 — Basic Movement', () => {
     const pos = await getCursorPos(page);
     expect(pos.row).toBe(3);
     expect(pos.col).toBe(14);
+  });
+
+  test('0-5 k moves up', async ({ page }) => {
+    await goToLevel(page, 0);
+    await page.locator('#editor-input').focus();
+    // j×4 goes to row 5 (last line), k×2 goes back to row 3
+    await pressKeys(page, ['j', 'j', 'j', 'j', 'k', 'k']);
+    const pos = await getCursorPos(page);
+    expect(pos.row).toBe(3);
+  });
+
+  test('0-6 h moves left', async ({ page }) => {
+    await goToLevel(page, 0);
+    await page.locator('#editor-input').focus();
+    // l×3 goes to col 8, h×2 goes back to col 6
+    await pressKeys(page, ['l', 'l', 'l', 'h', 'h']);
+    const pos = await getCursorPos(page);
+    expect(pos.col).toBe(6);
+  });
+
+  test('0-7 Count with l multiplies movement', async ({ page }) => {
+    await goToLevel(page, 0);
+    await page.locator('#editor-input').focus();
+    // 5l moves 5 columns right
+    await pressKeys(page, ['5', 'l']);
+    const pos = await getCursorPos(page);
+    expect(pos.col).toBe(10);
+  });
+
+  test('0-8 Cursor stays in NORMAL mode after movement', async ({ page }) => {
+    await goToLevel(page, 0);
+    await page.locator('#editor-input').focus();
+    await pressKeys(page, ['j', 'j', 'l', 'l']);
+    const mode = await getMode(page);
+    expect(mode).toBe('NORMAL');
+  });
+
+  test('0-9 gh goes to line start', async ({ page }) => {
+    await goToLevel(page, 1);
+    await page.locator('#editor-input').focus();
+    // Move to end first, then gh goes to start
+    await pressKeys(page, ['g', 'l', 'g', 'h']);
+    const pos = await getCursorPos(page);
+    expect(pos.col).toBe(0);
+  });
+
+  test('0-10 Movement across empty lines preserves column', async ({ page }) => {
+    await goToLevel(page, 4);
+    await page.locator('#editor-input').focus();
+    // Move down through lines with empty lines in between
+    await pressKeys(page, ['j', 'j', 'j', 'j']);
+    const pos = await getCursorPos(page);
+    expect(pos.row).toBe(4);
+    expect(pos.col).toBe(0);
+  });
+
+  test('0-11 World 0 tab shows correct name', async ({ page }) => {
+    await goToWorld(page, 0);
+    const indicator = await getLevelIndicator(page);
+    expect(indicator).toContain('World 0: First Steps');
   });
 });

@@ -203,14 +203,18 @@ export function updateUI() {
     try {
         const level = levels[gs.getCurrentLevel()];
         let targetWordRange = null;
-        if (level.target && level.targetWord) {
+        if (level.target) {
             const content = gs.getContent();
             const line = content[level.target.row];
             if (line) {
                 let start = level.target.col;
                 let end = level.target.col;
-                while (start > 0 && /\w/.test(line[start - 1])) start--;
-                while (end < line.length && /\w/.test(line[end])) end++;
+                if (level.targetWord) {
+                    while (start > 0 && /\w/.test(line[start - 1])) start--;
+                    while (end < line.length && /\w/.test(line[end])) end++;
+                } else {
+                    end = level.target.col + 1;
+                }
                 if (start < end) {
                     targetWordRange = { row: level.target.row, start, end };
                 }
@@ -231,7 +235,8 @@ export function updateUI() {
             gs.getCommandLog(),
             gs.getSearchMode(),
             gs.getSearchQuery(),
-            gs.getLastSearchDirection()
+            gs.getLastSearchDirection(),
+            hc.getBufferDisplay()
         );
 
         if (level) {

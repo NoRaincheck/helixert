@@ -524,13 +524,13 @@ function executeInsert(key, e) {
         if (c.col > 0) {
             gs.pushUndo();
             const line = tb.getLine(c.row);
-            tb.updateContentLine(c.row, line.slice(0, c.col - 1) + line.slice(c.col));
+            gs.updateContentLine(c.row, line.slice(0, c.col - 1) + line.slice(c.col));
             tb.moveCursorRelative(0, -1);
         } else if (c.row > 0) {
             gs.pushUndo();
             const prevLen = tb.getLineLength(c.row - 1);
             const currentLine = tb.getLine(c.row);
-            tb.updateContentLine(c.row - 1, tb.getLine(c.row - 1) + currentLine);
+            gs.updateContentLine(c.row - 1, tb.getLine(c.row - 1) + currentLine);
             tb.deleteLine(c.row);
             tb.moveCursor(c.row - 1, prevLen);
         }
@@ -544,7 +544,7 @@ function executeInsert(key, e) {
         const line = tb.getLine(c.row);
         const before = line.slice(0, c.col);
         const after = line.slice(c.col);
-        tb.updateContentLine(c.row, before);
+        gs.updateContentLine(c.row, before);
         tb.insertContentLine(c.row + 1, after);
         tb.moveCursor(c.row + 1, 0);
         gs.clearCommandLog();
@@ -663,7 +663,7 @@ export function executeReplace(key) {
         const line = tb.getLine(c.row);
         if (c.col < line.length) {
             gs.pushUndo();
-            tb.updateContentLine(c.row, line.slice(0, c.col) + key + line.slice(c.col + 1));
+            gs.updateContentLine(c.row, line.slice(0, c.col) + key + line.slice(c.col + 1));
             _lastChange = { type: 'replace', pos: { ...c }, char: key };
         }
         gs.setReplacePending(false);
@@ -684,7 +684,7 @@ function replayChange(change) {
         const line = tb.getLine(change.pos.row);
         if (change.pos.col < line.length) {
             gs.pushUndo();
-            tb.updateContentLine(change.pos.row,
+            gs.updateContentLine(change.pos.row,
                 line.slice(0, change.pos.col) + change.char + line.slice(change.pos.col + 1));
         }
     }

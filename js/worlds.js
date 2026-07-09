@@ -6,7 +6,7 @@ export const worlds = [
         name: 'First Steps',
         description: 'Basic Movement',
         icon: '👣',
-        color: '#4ecdc4',
+        color: '#4d96ff',
         commands: ['h', 'j', 'k', 'l', 'g'],
     },
     {
@@ -14,7 +14,7 @@ export const worlds = [
         name: 'Navigation',
         description: 'Advanced Movement',
         icon: '🧭',
-        color: '#f7a41d',
+        color: '#4d96ff',
         commands: ['w', 'b', 'e', '0', 'g', 'G'],
     },
     {
@@ -22,7 +22,7 @@ export const worlds = [
         name: 'The Stock Room',
         description: 'Select & Delete (Noun-Verb)',
         icon: '📦',
-        color: '#ff6b6b',
+        color: '#4d96ff',
         commands: ['x', 'd', 'u'],
     },
     {
@@ -30,7 +30,7 @@ export const worlds = [
         name: 'The Flavour Shelf',
         description: 'Replace & Swap',
         icon: '🔄',
-        color: '#ffd93d',
+        color: '#4d96ff',
         commands: ['r', 'x', 'p'],
     },
     {
@@ -38,7 +38,7 @@ export const worlds = [
         name: 'The Express Lane',
         description: 'Find & Till',
         icon: '🎯',
-        color: '#6bcb77',
+        color: '#4d96ff',
         commands: ['f', 'F', 't', 'T', ';', ','],
     },
     {
@@ -54,7 +54,7 @@ export const worlds = [
         name: 'The Modes Tour',
         description: 'Select Mode',
         icon: '🎨',
-        color: '#9b5de5',
+        color: '#4d96ff',
         commands: ['v', 'd', 'y', 'c', 'p'],
     },
     {
@@ -62,7 +62,7 @@ export const worlds = [
         name: 'Spot Check',
         description: 'Search',
         icon: '🔍',
-        color: '#ff85a1',
+        color: '#4d96ff',
         commands: ['/', '?', 'n', 'N'],
     },
     {
@@ -70,7 +70,7 @@ export const worlds = [
         name: 'The Back Office',
         description: 'Advanced Techniques',
         icon: '⚡',
-        color: '#00cec9',
+        color: '#4d96ff',
         commands: ['.', 'u', 'U', '%'],
     },
 ];

@@ -127,7 +127,7 @@ export function renderTargetDisplay(targetContent) {
 }
 
 // --- Status bar ---
-export function updateStatusBar(mode, countBuffer, commandLog, searchMode, searchQuery, searchDirection) {
+export function updateStatusBar(mode, countBuffer, commandLog, searchMode, searchQuery, searchDirection, bufferDisplay) {
     if (!statusBar) return;
 
     let text = `-- ${mode} --`;
@@ -135,10 +135,12 @@ export function updateStatusBar(mode, countBuffer, commandLog, searchMode, searc
     if (searchMode) {
         const prefix = searchDirection === 'backward' ? '?' : '/';
         text += ` ${prefix}${searchQuery}`;
+    } else if (bufferDisplay) {
+        text = `${bufferDisplay} ${text}`;
     }
 
     if (countBuffer) {
-        text = `${countBuffer}-- ${mode} --`;
+        text = `${countBuffer}${text}`;
     }
 
     statusBar.textContent = text;
