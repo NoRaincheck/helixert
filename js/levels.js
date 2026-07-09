@@ -273,7 +273,7 @@ export const levels = [
     {
         world: 3,
         name: 'Wrong Scoop',
-        instructions: 'Use <kbd class="kbd">r</kbd> + a character to replace the char under the cursor. Fix the typo.',
+        instructions: 'Use <kbd class="kbd">r</kbd> + a character to replace under the cursor.',
         initialContent: [
             'The quik brown fox',
         ],
@@ -287,7 +287,7 @@ export const levels = [
     {
         world: 3,
         name: 'Restamp the Row',
-        instructions: 'Replace multiple characters with <kbd class="kbd">r</kbd>. Fix all the X marks.',
+        instructions: 'Replace multiple characters with <kbd class="kbd">r</kbd>.',
         initialContent: [
             'X-X-X-X-X',
         ],
@@ -315,7 +315,7 @@ export const levels = [
     {
         world: 3,
         name: 'Rebuild the Cabinet',
-        instructions: 'Combine <kbd class="kbd">r</kbd> replace with <kbd class="kbd">x</kbd> select and <kbd class="kbd">d</kbd> delete to reshape the text.',
+        instructions: 'Combine <kbd class="kbd">r</kbd>, <kbd class="kbd">x</kbd>, and <kbd class="kbd">d</kbd> to reshape.',
         initialContent: [
             'foo---bar',
         ],
@@ -329,7 +329,7 @@ export const levels = [
     {
         world: 3,
         name: 'Batch Restock',
-        instructions: 'Use <kbd class="kbd">r</kbd> with counts to batch-replace, or <kbd class="kbd">x</kbd> + <kbd class="kbd">d</kbd> + <kbd class="kbd">p</kbd> to rearrange.',
+        instructions: 'Use <kbd class="kbd">r</kbd> with a count to batch-replace.',
         initialContent: [
             'aaa bbb ccc',
         ],

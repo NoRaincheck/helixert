@@ -328,6 +328,26 @@ kbd {
   background-color: color-mix(in srgb, var(--peach) 30%, transparent);
 }
 
+.target-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.target-content {
+  font-family: monospace;
+  font-size: 1.125rem;
+  line-height: 1.625;
+  background-color: var(--surface0);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--surface1) 50%, transparent);
+  color: var(--overlay1);
+  white-space: pre;
+  overflow-x: auto;
+  flex: 1;
+  min-height: 200px;
+}
+
 .status-bar {
   transition: background-color 0.15s ease;
   min-width: 180px;

@@ -6,7 +6,8 @@ import { worlds } from './levels.js';
 // DOM references
 let editorDisplay, statusBar, instructionsEl, levelIndicator, commandLogEl,
     editorContainer, resetBtn, modal, modalTitle, modalMessage, nextLevelBtn,
-    celebration, celebrationRestartBtn, levelSelectionContainer, worldTabsContainer;
+    celebration, celebrationRestartBtn, levelSelectionContainer, worldTabsContainer,
+    targetColumn, targetContentEl;
 
 export function initializeDOM() {
     editorDisplay = document.getElementById('editor-display');
@@ -24,6 +25,8 @@ export function initializeDOM() {
     celebrationRestartBtn = document.getElementById('celebration-restart');
     levelSelectionContainer = document.getElementById('level-selection');
     worldTabsContainer = document.getElementById('world-tabs');
+    targetColumn = document.getElementById('target-column');
+    targetContentEl = document.getElementById('target-content');
 }
 
 // --- Editor rendering ---
@@ -108,6 +111,19 @@ export function renderEditor(content, cursor, mode, selectStart, selectEnd, targ
     });
 
     editorDisplay.innerHTML = html;
+}
+
+// --- Target display ---
+export function renderTargetDisplay(targetContent) {
+    if (!targetColumn || !targetContentEl) return;
+
+    if (!targetContent) {
+        targetColumn.classList.add('hidden');
+        return;
+    }
+
+    targetColumn.classList.remove('hidden');
+    targetContentEl.textContent = targetContent.join('\n');
 }
 
 // --- Status bar ---

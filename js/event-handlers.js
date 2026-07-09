@@ -7,7 +7,8 @@ import { levels, worlds, getLevelCount, getLevelsForWorld } from './levels.js';
 import {
     renderEditor, updateStatusBar, updateInstructions, updateCommandLog,
     updateLevelIndicator, createLevelButtons, createWorldTabs,
-    showModal, hideModal, showCelebration, hideCelebration, flashLevelComplete
+    showModal, hideModal, showCelebration, hideCelebration, flashLevelComplete,
+    renderTargetDisplay
 } from './ui-components.js';
 import { saveProgress, getProgress } from './progress-system.js';
 
@@ -223,6 +224,7 @@ export function updateUI() {
             gs.getSelectEnd(),
             targetWordRange
         );
+        renderTargetDisplay(level ? level.targetContent : null);
         updateStatusBar(
             gs.getMode(),
             gs.getCountBuffer(),
