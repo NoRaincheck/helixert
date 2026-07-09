@@ -362,6 +362,21 @@ export function findCharBackward(row, col, ch, inclusive = true) {
 }
 
 /**
+ * Get the word boundaries at a given position. Returns {start, end} or null if not on a word.
+ */
+export function getWordRangeAt(row, col) {
+    const content = getContent();
+    const line = content[row];
+    if (!line || col < 0 || col >= line.length) return null;
+    if (!isWordChar(line[col])) return null;
+    let start = col;
+    let end = col;
+    while (start > 0 && isWordChar(line[start - 1])) start--;
+    while (end < line.length && isWordChar(line[end])) end++;
+    return { start, end };
+}
+
+/**
  * Find matching bracket.
  */
 export function findMatchBracket(row, col) {

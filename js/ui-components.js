@@ -27,7 +27,7 @@ export function initializeDOM() {
 }
 
 // --- Editor rendering ---
-export function renderEditor(content, cursor, mode, selectStart, selectEnd) {
+export function renderEditor(content, cursor, mode, selectStart, selectEnd, targetWordRange) {
     if (!editorDisplay) return;
 
     const searchMatches = getSearchMatches();
@@ -89,6 +89,8 @@ export function renderEditor(content, cursor, mode, selectStart, selectEnd) {
                 cls = 'search-current';
             } else if (isSearchMatch) {
                 cls = 'search-match';
+            } else if (targetWordRange && rowIdx === targetWordRange.row && colIdx >= targetWordRange.start && colIdx < targetWordRange.end) {
+                cls = 'target-word';
             }
 
             if (cls) {

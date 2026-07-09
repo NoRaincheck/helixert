@@ -324,6 +324,10 @@ kbd {
   color: var(--crust);
 }
 
+.editor-display .target-word {
+  background-color: color-mix(in srgb, var(--peach) 30%, transparent);
+}
+
 .status-bar {
   transition: background-color 0.15s ease;
   min-width: 180px;

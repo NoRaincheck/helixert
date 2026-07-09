@@ -79,7 +79,12 @@ export function checkWinCondition() {
 
     if (level.target) {
         const cursor = gs.getCursor();
-        won = cursor.row === level.target.row && cursor.col === level.target.col;
+        if (level.targetWord) {
+            const range = tb.getWordRangeAt(level.target.row, level.target.col);
+            won = range && cursor.row === level.target.row && cursor.col >= range.start && cursor.col < range.end;
+        } else {
+            won = cursor.row === level.target.row && cursor.col === level.target.col;
+        }
     } else if (level.targetText) {
         const content = gs.getContent();
         won = content[level.targetText.line] === level.targetText.text && gs.getMode() === 'NORMAL';
@@ -195,12 +200,28 @@ export function updateUI() {
     if (_isUpdating) return;
     _isUpdating = true;
     try {
+        const level = levels[gs.getCurrentLevel()];
+        let targetWordRange = null;
+        if (level.target && level.targetWord) {
+            const content = gs.getContent();
+            const line = content[level.target.row];
+            if (line) {
+                let start = level.target.col;
+                let end = level.target.col;
+                while (start > 0 && /\w/.test(line[start - 1])) start--;
+                while (end < line.length && /\w/.test(line[end])) end++;
+                if (start < end) {
+                    targetWordRange = { row: level.target.row, start, end };
+                }
+            }
+        }
         renderEditor(
             gs.getContent(),
             gs.getCursor(),
             gs.getMode(),
             gs.getSelectStart(),
-            gs.getSelectEnd()
+            gs.getSelectEnd(),
+            targetWordRange
         );
         updateStatusBar(
             gs.getMode(),
@@ -211,7 +232,6 @@ export function updateUI() {
             gs.getLastSearchDirection()
         );
 
-        const level = levels[gs.getCurrentLevel()];
         if (level) {
             updateInstructions(level.instructions);
         }
