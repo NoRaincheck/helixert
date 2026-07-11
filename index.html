@@ -1,107 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Helixert — Learn Helix Keybindings</title>
     <link rel="stylesheet" href="css/main.css">
-</head>
-<body>
+  </head>
+  <body>
     <div class="w-full max-w-5xl mx-auto">
-        <!-- Header -->
-        <div class="text-center mb-6">
-            <pre class="ascii-logo">▗▖ ▗▖▗▄▄▄▖▗▖   ▗▄▄▄▖▗▖  ▗▖▗▄▄▄▖▗▄▄▖▗▄▄▄▖
+      <!-- Header -->
+      <div class="text-center mb-6">
+        <pre
+          class="ascii-logo"
+        >▗▖ ▗▖▗▄▄▄▖▗▖   ▗▄▄▄▖▗▖  ▗▖▗▄▄▄▖▗▄▄▖▗▄▄▄▖
 ▐▌ ▐▌▐▌   ▐▌     █   ▝▚▞▘ ▐▌   ▐▌ ▐▌ █  
 ▐▛▀▜▌▐▛▀▀▘▐▌     █    ▐▌  ▐▛▀▀▘▐▛▀▚▖ █  
 ▐▌ ▐▌▐▙▄▄▖▐▙▄▄▖▗▄█▄▖▗▞▘▝▚▖▐▙▄▄▖▐▌ ▐▌ █  
             </pre>
-            <p class="text-sm text-overlay0">Master Helix-style modal editing through focused levels</p>
-        </div>
+        <p class="text-sm text-overlay0">
+          Master Helix-style modal editing through focused levels
+        </p>
+      </div>
 
-        <!-- Instructions -->
-        <div class="instructions-box">
-            <p id="instructions" class="text-lg text-center text-sky font-medium">Welcome! Let's learn Helix together.</p>
-        </div>
+      <!-- Instructions -->
+      <div class="instructions-box">
+        <p id="instructions" class="text-lg text-center text-sky font-medium">
+          Welcome! Let's learn Helix together.
+        </p>
+      </div>
 
-        <!-- Main Editor -->
-        <div id="editor-container" class="editor-wrapper">
-            <div class="flex flex-col md:flex-row gap-4">
-                <div class="editor-column flex-1 min-w-0">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-2">
-                            <div class="text-sm text-overlay1 font-medium">Helix Editor</div>
-                            <button id="reset-btn" class="btn-reset">
-                                Reset Level
-                            </button>
-                        </div>
-                        <div class="editor-hint">
-                            <kbd>Esc</kbd> Normal mode
-                            &middot;
-                            <kbd>v</kbd> Select mode
-                        </div>
-                    </div>
-                    <div id="editor-display" class="editor-display"></div>
-                    <textarea id="editor-input" class="absolute top-0 left-0 w-full h-full opacity-0 cursor-default" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+      <!-- Main Editor -->
+      <div id="editor-container" class="editor-wrapper">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="editor-column flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <div class="text-sm text-overlay1 font-medium">
+                  Helix Editor
                 </div>
-                <div id="target-column" class="target-column flex-1 min-w-0 hidden">
-                    <div class="text-sm text-overlay1 font-medium mb-4">Target</div>
-                    <div id="target-content" class="target-content"></div>
-                </div>
+                <button id="reset-btn" class="btn-reset">
+                  Reset Level
+                </button>
+              </div>
+              <div class="editor-hint">
+                <kbd>Esc</kbd> Normal mode &middot;
+                <kbd>v</kbd> Select mode
+              </div>
             </div>
-
-            <!-- Status Bar - full width -->
-            <div class="flex flex-col md:flex-row justify-between items-center mt-4 gap-2">
-                <div id="status-bar" class="status-bar mode-normal">
-                    -- NORMAL --
-                </div>
-                <div id="command-log" class="command-log"></div>
-            </div>
+            <div id="editor-display" class="editor-display"></div>
+            <textarea
+              id="editor-input"
+              class="absolute top-0 left-0 w-full h-full opacity-0 cursor-default"
+              spellcheck="false"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+            ></textarea>
+          </div>
+          <div id="target-column" class="target-column flex-1 min-w-0 hidden">
+            <div class="text-sm text-overlay1 font-medium mb-4">Target</div>
+            <div id="target-content" class="target-content"></div>
+          </div>
         </div>
 
-        <!-- Level Controls -->
-        <div id="level-indicator" class="text-overlay1 font-semibold text-lg text-center mt-4"></div>
+        <!-- Status Bar - full width -->
+        <div
+          class="flex flex-col md:flex-row justify-between items-center mt-4 gap-2"
+        >
+          <div id="status-bar" class="status-bar mode-normal">
+            -- NORMAL --
+          </div>
+          <div id="command-log" class="command-log"></div>
+        </div>
+      </div>
 
-        <!-- World Tabs -->
-        <div id="world-tabs"></div>
+      <!-- Level Controls -->
+      <div
+        id="level-indicator"
+        class="text-overlay1 font-semibold text-lg text-center mt-4"
+      >
+      </div>
 
-        <!-- Level Selection -->
-        <div id="level-selection"></div>
+      <!-- World Tabs -->
+      <div id="world-tabs"></div>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <p class="text-sm text-overlay0">
-                Helixert — Learn <a href="https://helix-editor.com" target="_blank">Helix</a> keybindings
-                &middot;
-                <a href="https://github.com" target="_blank">Source</a>
-            </p>
-        </footer>
+      <!-- Level Selection -->
+      <div id="level-selection"></div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p class="text-sm text-overlay0">
+          Helixert — Learn <a href="https://helix-editor.com" target="_blank"
+          >Helix</a> keybindings &middot;
+          <a href="https://github.com" target="_blank">Source</a>
+        </p>
+      </footer>
     </div>
 
     <!-- Modal -->
-    <div id="modal" class="fixed inset-0 flex items-center justify-center modal-bg opacity-0 pointer-events-none z-50">
-        <div id="modal-content" class="modal-content">
-            <h2 id="modal-title" class="modal-title">Level Complete!</h2>
-            <div id="modal-message" class="modal-message"></div>
-            <button id="next-level-btn" class="btn-primary">
-                Next Level
-            </button>
-        </div>
+    <div
+      id="modal"
+      class="fixed inset-0 flex items-center justify-center modal-bg opacity-0 pointer-events-none z-50"
+    >
+      <div id="modal-content" class="modal-content">
+        <h2 id="modal-title" class="modal-title">Level Complete!</h2>
+        <div id="modal-message" class="modal-message"></div>
+        <button id="next-level-btn" class="btn-primary">
+          Next Level
+        </button>
+      </div>
     </div>
 
     <!-- Celebration Overlay -->
-    <div id="celebration" class="fixed inset-0 hidden z-50 flex items-center justify-center">
-        <div class="celebration-overlay"></div>
-        <div class="text-center px-6 relative z-10">
-            <div class="celebration-title">
-                MASTERED!
-            </div>
-            <div class="celebration-text">You've conquered all Helix basics!</div>
-            <button id="celebration-restart" class="btn-primary-lg">
-                Play Again
-            </button>
+    <div
+      id="celebration"
+      class="fixed inset-0 hidden z-50 flex items-center justify-center"
+    >
+      <div class="celebration-overlay"></div>
+      <div class="text-center px-6 relative z-10">
+        <div class="celebration-title">
+          MASTERED!
         </div>
+        <div class="celebration-text">You've conquered all Helix basics!</div>
+        <button id="celebration-restart" class="btn-primary-lg">
+          Play Again
+        </button>
+      </div>
     </div>
 
     <script type="module" src="js/main.js"></script>
-</body>
+  </body>
 </html>
