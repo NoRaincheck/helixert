@@ -336,13 +336,13 @@ export const levels = [
     instructions:
       'Use <kbd class="kbd">r</kbd> + a character to replace under the cursor.',
     initialContent: [
-      "The quik brown fox",
+      "The qyick brown fox",
     ],
     targetContent: [
       "The quick brown fox",
     ],
     setup: (s) => {
-      s.cursor = { row: 0, col: 7 };
+      s.cursor = { row: 0, col: 5 };
     },
     commands: ["r"],
     par: 2,
