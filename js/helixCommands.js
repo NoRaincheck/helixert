@@ -220,6 +220,19 @@ function executeSingle(key, e) {
   if (key === "c") return executeOperator("c");
   if (key === "y") return executeOperator("y");
 
+  // --- Paste after (p) ---
+  if (key === "p") {
+    const text = gs.getYankedText();
+    if (text) {
+      gs.pushUndo();
+      tb.pasteAfter(text);
+      gs.clearCommandLog();
+      return { handled: true, operated: "p" };
+    }
+    gs.clearCommandLog();
+    return { handled: true };
+  }
+
   // --- Replace single char ---
   if (key === "r") {
     gs.setReplacePending(true);
@@ -479,6 +492,7 @@ function executeOperator(op) {
       const line = content[cursor.row] || "";
       if (cursor.col < line.length) {
         gs.pushUndo();
+        gs.setYankedText(line[cursor.col]);
         content[cursor.row] = line.slice(0, cursor.col) +
           line.slice(cursor.col + 1);
         gs.setContent(content);
@@ -532,6 +546,10 @@ function executeOperator(op) {
   }
 
   resetCount();
+  // Return to NORMAL mode after d/y in SELECT mode
+  if (op !== "c" && gs.getMode() === "SELECT") {
+    gs.setMode("NORMAL");
+  }
   gs.clearCommandLog();
   return { handled: true, operated: op };
 }

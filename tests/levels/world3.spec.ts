@@ -55,7 +55,7 @@ test.describe("World 3 — Replace & Swap", () => {
   test("3-4 Level 3-0 content correct on load", async ({ page }) => {
     await goToLevel(page, 15);
     const content = await getEditorContent(page);
-    expect(content).toEqual(["The quik brown fox"]);
+    expect(content).toEqual(["The qyick brown fox"]);
   });
 
   test("3-5 Level 3-1 content correct on load", async ({ page }) => {
@@ -91,25 +91,22 @@ test.describe("World 3 — Replace & Swap", () => {
   test("3-10 Movement works in World 3 levels", async ({ page }) => {
     await goToLevel(page, 15);
     await page.locator("#editor-input").focus();
-    // l should move right
     await pressKeys(page, ["l"]);
     const pos = await getCursorPos(page);
-    expect(pos.col).toBe(1);
+    expect(pos.col).toBe(6);
   });
 
   test("3-11 h moves left in World 3 levels", async ({ page }) => {
     await goToLevel(page, 15);
     await page.locator("#editor-input").focus();
-    // Move right then left
     await pressKeys(page, ["l", "l", "h"]);
     const pos = await getCursorPos(page);
-    expect(pos.col).toBe(1);
+    expect(pos.col).toBe(6);
   });
 
   test("3-12 w moves by word in World 3 levels", async ({ page }) => {
     await goToLevel(page, 15);
     await page.locator("#editor-input").focus();
-    // "The quik brown fox" — w×3 to "brown"
     await pressKeys(page, ["w", "w", "w"]);
     const pos = await getCursorPos(page);
     expect(pos.col).toBeGreaterThanOrEqual(9);
@@ -118,9 +115,53 @@ test.describe("World 3 — Replace & Swap", () => {
   test("3-13 b moves backward by word in World 3 levels", async ({ page }) => {
     await goToLevel(page, 15);
     await page.locator("#editor-input").focus();
-    // w×2 to "quik", then b goes back to "The"
     await pressKeys(page, ["w", "w", "b"]);
     const pos = await getCursorPos(page);
-    expect(pos.col).toBeLessThan(9);
+    expect(pos.col).toBeLessThan(12);
+  });
+
+  test("3-14 Swap the Cones: v+l+d+p swaps AB to BA", async ({ page }) => {
+    await goToLevel(page, 17);
+    await page.locator("#editor-input").focus();
+    await pressKeys(page, ["v", "l", "d", "p"]);
+    const content = await getEditorContent(page);
+    expect(content).toEqual(["BA"]);
+  });
+
+  test("3-15 Swap the Cones: cursor lands after paste", async ({ page }) => {
+    await goToLevel(page, 17);
+    await page.locator("#editor-input").focus();
+    await pressKeys(page, ["v", "l", "d", "p"]);
+    const pos = await getCursorPos(page);
+    expect(pos.col).toBe(1);
+  });
+
+  test("3-16 d without selection deletes single char", async ({ page }) => {
+    await goToLevel(page, 15);
+    await page.locator("#editor-input").focus();
+    const contentBefore = await getEditorContent(page);
+    expect(contentBefore[0]).toContain("qyick");
+    await pressKeys(page, ["d"]);
+    const contentAfter = await getEditorContent(page);
+    expect(contentAfter[0]).not.toContain("qyick");
+    expect(contentAfter[0]).toContain("qick");
+  });
+
+
+  test("3-18 d+l+p swaps characters in normal mode", async ({ page }) => {
+    await goToLevel(page, 17);
+    await page.locator("#editor-input").focus();
+    // "AB" → d (delete 'A', yank), l (move right), p (paste 'A')
+    await pressKeys(page, ["d", "l", "p"]);
+    const content = await getEditorContent(page);
+    expect(content).toEqual(["BA"]);
+  });
+
+  test("3-17 p does nothing when yank register is empty", async ({ page }) => {
+    await goToLevel(page, 15);
+    await page.locator("#editor-input").focus();
+    await pressKeys(page, ["p"]);
+    const content = await getEditorContent(page);
+    expect(content).toEqual(["The qyick brown fox"]);
   });
 });

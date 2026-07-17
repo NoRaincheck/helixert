@@ -369,7 +369,7 @@ export const levels = [
     world: 3,
     name: "Swap the Cones",
     instructions:
-      'Swap two characters: <kbd class="kbd">x</kbd> to select, <kbd class="kbd">d</kbd> to delete (yanks), then move and <kbd class="kbd">p</kbd> to paste.',
+      'Swap two characters: <kbd class="kbd">v</kbd> to select, move to extend, <kbd class="kbd">d</kbd> to delete (yanks), then <kbd class="kbd">p</kbd> to paste.',
     initialContent: [
       "AB",
     ],
@@ -379,9 +379,9 @@ export const levels = [
     setup: (s) => {
       s.cursor = { row: 0, col: 0 };
     },
-    commands: ["x", "d", "p"],
+    commands: ["v", "l", "d", "p"],
     par: 4,
-    wizard: 2,
+    wizard: 3,
   },
   {
     world: 3,
