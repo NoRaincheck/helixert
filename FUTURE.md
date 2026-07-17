@@ -1,7 +1,8 @@
-# Future Learning Roadmap — Vim Scoops Worlds & Motions
+# Future Learning Roadmap — Helixert Worlds & Motions
 
-Based on [Vim Scoops](https://vimscoops.dev/game) — 45 levels across 9 worlds
-teaching Vim motions.
+Adapted from [Vim Scoops](https://vimscoops.dev/game) — 45 levels across 9 worlds.
+Teaching **Helix** keybindings (noun-verb: select first, then operate), with notes
+on differences from Vim.
 
 ---
 
@@ -58,7 +59,7 @@ non-blank char, chaining motions into routes.
 
 ## World 3 — The Flavour Shelf
 
-> Restock cones by letter with replace, and swap with x and p.
+> Replace single characters with `r`, and swap with x and p.
 
 | Level | Title               | Teaches           |
 | ----- | ------------------- | ----------------- |
@@ -68,8 +69,16 @@ non-blank char, chaining motions into routes.
 | 3-4   | Rebuild the Cabinet | `dd`, `p`, `r`    |
 | 3-5   | Batch Restock       | counts + `r`, `l` |
 
-**Key motions:** `r` replace char, `x` + `p` for swapping adjacent chars,
-`count + r` batch replace.
+**Key motions:** `r{char}` replace single char under cursor (Helix: one char at a
+time, same as Vim's `r` — no find-and-replace here).
+`x` + `p` for swapping adjacent chars, `count + r` batch replace same char.
+
+> **Helix vs Vim note:** In both Helix and Vim, `r` replaces only the single
+> character under the cursor (optionally repeated with a count). Helix does **not**
+> have a Vim-style `:s/foo/bar/g` substitute command. For bulk find-and-replace in
+> Helix, the idiomatic approach is `%` (select all) → `s{pattern}` (narrow to
+> regex matches, creating multi-cursor) → `c` (change all selections). This
+> multi-cursor workflow is discussed in [Helix #3630](https://github.com/helix-editor/helix/discussions/3630).
 
 ---
 
@@ -105,8 +114,8 @@ find, `,` reverse find.
 
 **Key motions:** `i` insert before cursor, `a` insert after cursor, `A` append
 end of line, `I` insert at line start, `o` open line below, `O` open line above,
-`cc` change line, `C` change to end, `s` substitute char, `ci"` change inside
-quotes, `ciw` change inner word.
+`cc` change line, `C` change to end, `s` narrow to regex matches (Helix),
+`ci"` change inside quotes, `ciw` change inner word.
 
 ---
 
@@ -145,6 +154,12 @@ paste before cursor.
 **Key motions:** `/` search forward, `?` search backward, `n` next match, `N`
 previous match, `*` search word under cursor forward, `#` search word under
 cursor backward.
+
+> **Helix search-and-replace:** In Helix, after searching with `/`, you can press
+> `c` on a match to change it (entering insert mode), then `n` to jump to the next
+> match and `.` to repeat the last change. For bulk replace across the whole
+> buffer, use `%` (select all) → `s{regex}` (narrow to regex matches via multi-
+> cursor) → `c` (change all). See [Helix #3630](https://github.com/helix-editor/helix/discussions/3630).
 
 ---
 
@@ -197,14 +212,17 @@ macro to register a, `@a` replay macro from register a, `@@` repeat last macro,
 | `yy`      | Yank (copy) line                       |
 | `p`       | Paste after cursor                     |
 | `P`       | Paste before cursor                    |
-| `r{char}` | Replace char                           |
+| `r{char}` | Replace single char under cursor       |
 | `.`       | Repeat last change                     |
 | `u`       | Undo                                   |
 | `cc`      | Change (replace) entire line           |
 | `C`       | Change to end of line                  |
-| `s`       | Substitute (delete) char, enter insert |
+| `s`       | Narrow selection to regex matches      |
 | `ci"`     | Change inside quotes                   |
 | `ciw`     | Change inner word                      |
+
+> **Bulk replace (Helix):** `%` → `s{regex}` → `c` — select all, narrow to regex
+> matches (multi-cursor), then change all. No Vim-style `:s` command exists.
 
 ### Insert Mode
 
@@ -220,14 +238,16 @@ macro to register a, `@a` replay macro from register a, `@@` repeat last macro,
 
 ### Visual Mode
 
-| Motion        | Action                  |
-| ------------- | ----------------------- |
-| `v`           | Character visual select |
-| `V`           | Line visual select      |
-| `Ctrl-v`      | Block visual select     |
-| `d` in visual | Delete selection        |
-| `y` in visual | Yank selection          |
-| `c` in visual | Change selection        |
+| Motion        | Action                                  |
+| ------------- | --------------------------------------- |
+| `v`           | Character visual select                 |
+| `V`           | Line visual select                      |
+| `Ctrl-v`      | Block visual select                     |
+| `d` in visual | Delete selection                        |
+| `y` in visual | Yank selection                          |
+| `c` in visual | Change selection                        |
+| `s` in visual | Narrow selection to regex matches (multi-cursor) |
+| `%`           | Select entire buffer                    |
 
 ### Search
 
@@ -238,6 +258,7 @@ macro to register a, `@a` replay macro from register a, `@@` repeat last macro,
 | `n`        | Next match               |
 | `N`        | Previous match           |
 | `*`        | Search word under cursor |
+| `c` (on match) | Change match, enter insert |
 
 ### Registers & Macros
 
@@ -250,4 +271,5 @@ macro to register a, `@a` replay macro from register a, `@@` repeat last macro,
 
 ---
 
-_Generated from https://vimscoops.dev/game — 45 levels, 9 worlds, all free._
+_Adapted from https://vimscoops.dev/game — 45 levels, 9 worlds, all free.
+Re-tuned for Helix noun-verb semantics._
