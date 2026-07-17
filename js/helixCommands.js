@@ -585,6 +585,10 @@ function executeInsert(key, e) {
   }
 
   if (key === "Enter") {
+    if (tb.getLineCount() >= 50) {
+      gs.clearCommandLog();
+      return { handled: true };
+    }
     gs.pushUndo();
     const c = gs.getCursor();
     const line = tb.getLine(c.row);
@@ -602,6 +606,46 @@ function executeInsert(key, e) {
     const c = gs.getCursor();
     tb.insertText(c.row, c.col, "    ");
     tb.moveCursorRelative(0, 4);
+    gs.clearCommandLog();
+    return { handled: true };
+  }
+
+  // Arrow keys in INSERT mode
+  if (key === "ArrowLeft") {
+    const c = gs.getCursor();
+    if (c.col > 0) {
+      tb.moveCursorRelative(0, -1);
+    } else if (c.row > 0) {
+      tb.moveCursor(c.row - 1, tb.getLineLength(c.row - 1));
+    }
+    gs.clearCommandLog();
+    return { handled: true };
+  }
+  if (key === "ArrowRight") {
+    const c = gs.getCursor();
+    if (c.col < tb.getLineLength(c.row)) {
+      tb.moveCursorRelative(0, 1);
+    } else if (c.row < tb.getLineCount() - 1) {
+      tb.moveCursor(c.row + 1, 0);
+    }
+    gs.clearCommandLog();
+    return { handled: true };
+  }
+  if (key === "ArrowUp") {
+    const c = gs.getCursor();
+    if (c.row > 0) {
+      const targetCol = Math.min(c.col, tb.getLineLength(c.row - 1));
+      tb.moveCursor(c.row - 1, targetCol);
+    }
+    gs.clearCommandLog();
+    return { handled: true };
+  }
+  if (key === "ArrowDown") {
+    const c = gs.getCursor();
+    if (c.row < tb.getLineCount() - 1) {
+      const targetCol = Math.min(c.col, tb.getLineLength(c.row + 1));
+      tb.moveCursor(c.row + 1, targetCol);
+    }
     gs.clearCommandLog();
     return { handled: true };
   }

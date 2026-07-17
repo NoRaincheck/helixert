@@ -147,6 +147,11 @@ export function renderEditor(
   });
 
   editorDisplay.innerHTML = html;
+  // Scroll cursor into view
+  const cursorEl = editorDisplay.querySelector(".cursor, .insert-cursor, .selected-cursor");
+  if (cursorEl) {
+    cursorEl.scrollIntoView({ block: "nearest" });
+  }
 }
 
 // --- Target display ---

@@ -527,7 +527,8 @@ kbd {
 
 .editor-display {
   position: relative;
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 600px;
   tab-size: 4;
   font-size: 1.125rem;
   flex: 1;
