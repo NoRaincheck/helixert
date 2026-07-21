@@ -56,24 +56,6 @@ Helix uses **noun-verb** order (opposite of Vim):
 - Deno for development server
 - No frameworks, no build step
 
-## Project Structure
-
-```
-helixert/
-├── index.html              # Entry point
-├── css/main.css            # Styles
-├── js/
-│   ├── main.js             # Entry point, event binding
-│   ├── gameState.js        # Centralized state
-│   ├── helixCommands.js    # Helix command engine
-│   ├── textBuffer.js       # Text buffer model
-│   ├── levels.js           # 16 level definitions
-│   ├── ui-components.js    # DOM rendering
-│   ├── event-handlers.js   # Game logic
-│   └── progress-system.js  # localStorage persistence
-└── deno.json               # Deno tasks
-```
-
 ## Credits
 
 - Inspired by: [vimMaster](https://github.com/renzorlive/vimmaster),
