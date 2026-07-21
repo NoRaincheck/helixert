@@ -119,6 +119,7 @@ function handleSearchKey(e) {
 
   if (gs.isEscapeKey(e)) {
     gs.setSearchMode(false);
+    gs.setSearchSelectMode(false);
     gs.setSearchQuery("");
     updateUI();
     return;
@@ -140,6 +141,24 @@ function handleSearchKey(e) {
     // Compute matches
     const matches = tb_computeSearchMatches(query);
     gs.setSearchMatches(matches);
+
+    // Search-select mode: create selection on first match
+    if (gs.getSearchSelectMode()) {
+      gs.setSearchSelectMode(false);
+      if (matches.length > 0) {
+        const m = matches[0];
+        gs.setSelectStart({ row: m.row, col: m.start });
+        gs.setSelectEnd({ row: m.row, col: m.end });
+        import("./textBuffer.js").then((tb) => {
+          tb.moveCursor(m.row, m.start);
+          updateUI();
+          checkWinCondition();
+        });
+      } else {
+        updateUI();
+      }
+      return;
+    }
 
     // Jump to first match
     if (matches.length > 0) {

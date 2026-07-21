@@ -12,6 +12,7 @@ let _countBuffer = "";
 let _undoStack = [];
 let _redoStack = [];
 let _searchMode = false;
+let _searchSelectMode = false;
 let _searchQuery = "";
 let _lastSearchQuery = null;
 let _lastSearchDirection = "forward";
@@ -44,6 +45,7 @@ export const getCountBuffer = () => _countBuffer;
 export const getUndoStack = () => [..._undoStack];
 export const getRedoStack = () => [..._redoStack];
 export const getSearchMode = () => _searchMode;
+export const getSearchSelectMode = () => _searchSelectMode;
 export const getSearchQuery = () => _searchQuery;
 export const getLastSearchQuery = () => _lastSearchQuery;
 export const getLastSearchDirection = () => _lastSearchDirection;
@@ -96,6 +98,9 @@ export const setCountBufferAppend = (k) => {
 };
 export const setSearchMode = (m) => {
   _searchMode = m;
+};
+export const setSearchSelectMode = (m) => {
+  _searchSelectMode = m;
 };
 export const setSearchQuery = (q) => {
   _searchQuery = q;
@@ -222,6 +227,7 @@ export const resetLevelState = () => {
   _undoStack = [];
   _redoStack = [];
   _searchMode = false;
+  _searchSelectMode = false;
   _searchQuery = "";
   _lastSearchQuery = null;
   _lastSearchDirection = "forward";

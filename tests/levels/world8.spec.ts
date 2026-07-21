@@ -114,10 +114,10 @@ test.describe("World 8 — Advanced Techniques", () => {
     expect(pos.col).toBeGreaterThanOrEqual(8);
   });
 
-  test("8-12 % key is processed in NORMAL mode", async ({ page }) => {
+  test("8-12 m key is processed in NORMAL mode", async ({ page }) => {
     await goToLevel(page, 42);
     await page.locator("#editor-input").focus();
-    await pressKeys(page, ["%"]);
+    await pressKeys(page, ["m"]);
     const mode = await getMode(page);
     expect(mode).toBe("NORMAL");
   });

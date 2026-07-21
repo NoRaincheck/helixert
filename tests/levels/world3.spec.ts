@@ -164,4 +164,23 @@ test.describe("World 3 — Replace & Swap", () => {
     const content = await getEditorContent(page);
     expect(content).toEqual(["The qyick brown fox"]);
   });
+
+  test("3-19 Batch Restock: %s selects aaa, c changes to xxx", async ({ page }) => {
+    await goToLevel(page, 19);
+    await page.locator("#editor-input").focus();
+    // Pass 1: aaa → xxx
+    await pressKeys(page, ["%", "s", "a", "a", "a", "Enter", "c", "x", "x", "x", "Escape"]);
+    const content1 = await getEditorContent(page);
+    expect(content1).toEqual(["xxx bbb ccc"]);
+    // Pass 2: ccc → yyy
+    await pressKeys(page, ["%", "s", "c", "c", "c", "Enter", "c", "y", "y", "y", "Escape"]);
+    const content2 = await getEditorContent(page);
+    expect(content2).toEqual(["xxx bbb yyy"]);
+  });
+
+  test("3-20 Batch Restock: content correct on load", async ({ page }) => {
+    await goToLevel(page, 19);
+    const content = await getEditorContent(page);
+    expect(content).toEqual(["aaa bbb ccc"]);
+  });
 });

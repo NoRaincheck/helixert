@@ -383,14 +383,37 @@ function executeSingle(key, e) {
     return { handled: true, moved: true };
   }
 
-  // --- Match bracket ---
+  // --- Select all ---
   if (key === "%") {
+    const content = gs.getContent();
+    if (content.length > 0) {
+      gs.setSelectStart({ row: 0, col: 0 });
+      const lastRow = content.length - 1;
+      const lastCol = content[lastRow].length;
+      gs.setSelectEnd({ row: lastRow, col: lastCol });
+    }
+    resetCount();
+    gs.clearCommandLog();
+    return { handled: true, selected: true };
+  }
+
+  // --- Match bracket ---
+  if (key === "m") {
     const c = gs.getCursor();
     const match = tb.findMatchBracket(c.row, c.col);
     if (match) tb.moveCursor(match.row, match.col);
     resetCount();
     gs.clearCommandLog();
     return { handled: true, moved: true };
+  }
+
+  // --- Search-select (select all matches within current selection) ---
+  if (key === "s") {
+    gs.setSearchMode(true);
+    gs.setSearchQuery("");
+    gs.setSearchSelectMode(true);
+    resetCount();
+    return { handled: true, searchMode: true };
   }
 
   // Ignore unhandled keys

@@ -404,7 +404,8 @@ export const levels = [
   {
     world: 3,
     name: "Batch Restock",
-    instructions: 'Use <kbd class="kbd">r</kbd> with a count to batch-replace.',
+    instructions:
+      'Use <kbd class="kbd">%</kbd> to select all, <kbd class="kbd">s</kbd> to search within selection, then <kbd class="kbd">c</kbd> to change.',
     initialContent: [
       "aaa bbb ccc",
     ],
@@ -414,8 +415,8 @@ export const levels = [
     setup: (s) => {
       s.cursor = { row: 0, col: 0 };
     },
-    commands: ["r", "l"],
-    par: 4,
+    commands: ["%", "s", "c"],
+    par: 22,
     wizard: 2,
   },
 
@@ -835,7 +836,7 @@ export const levels = [
     world: 8,
     name: "Match Bracket",
     instructions:
-      'Use <kbd class="kbd">%</kbd> to jump to the matching bracket. Navigate between opening and closing parens.',
+      'Use <kbd class="kbd">m</kbd> to jump to the matching bracket. Navigate between opening and closing parens.',
     initialContent: [
       "(nested (brackets) here)",
     ],
@@ -843,7 +844,7 @@ export const levels = [
     setup: (s) => {
       s.cursor = { row: 0, col: 0 };
     },
-    commands: ["%"],
+    commands: ["m"],
     par: 2,
     wizard: 1,
   },

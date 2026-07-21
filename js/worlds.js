@@ -71,6 +71,6 @@ export const worlds = [
     description: "Advanced Techniques",
     icon: "⚡",
     color: "#4d96ff",
-    commands: [".", "u", "U", "%"],
+    commands: [".", "u", "U", "m"],
   },
 ];
