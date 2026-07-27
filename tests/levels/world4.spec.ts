@@ -123,4 +123,110 @@ test.describe("World 4 — Find & Till", () => {
     const mode = await getMode(page);
     expect(mode).toBe("NORMAL");
   });
+
+  test("4-14 f buffer survives Shift keydown before target char", async ({
+    page,
+  }) => {
+    await goToLevel(page, 20);
+    await page.locator("#editor-input").focus();
+    // Press f — buffer should show pending
+    await page.keyboard.press("f");
+    await page.waitForTimeout(50);
+    let status = await getStatusBar(page);
+    expect(status).toContain("f → ?");
+    // Press and release Shift alone — must NOT clear the buffer
+    await page.keyboard.down("Shift");
+    await page.waitForTimeout(50);
+    status = await getStatusBar(page);
+    expect(status).toContain("f → ?");
+    await page.keyboard.up("Shift");
+    await page.waitForTimeout(50);
+    status = await getStatusBar(page);
+    expect(status).toContain("f → ?");
+    // Now press the actual character
+    await page.keyboard.press("@");
+    await page.waitForTimeout(50);
+    const pos = await getCursorPos(page);
+    expect(pos.row).toBe(0);
+    expect(pos.col).toBe(11);
+  });
+
+  test("4-15 F buffer survives Shift keydown before target char", async ({
+    page,
+  }) => {
+    await goToLevel(page, 21);
+    await page.locator("#editor-input").focus();
+    // Press F — buffer should show pending
+    await page.keyboard.press("F");
+    await page.waitForTimeout(50);
+    let status = await getStatusBar(page);
+    expect(status).toContain("F → ?");
+    // Press and release Shift — must NOT clear the buffer
+    await page.keyboard.down("Shift");
+    await page.waitForTimeout(50);
+    status = await getStatusBar(page);
+    expect(status).toContain("F → ?");
+    await page.keyboard.up("Shift");
+    await page.waitForTimeout(50);
+    status = await getStatusBar(page);
+    expect(status).toContain("F → ?");
+    // Now press the actual character
+    await page.keyboard.press("(");
+    await page.waitForTimeout(50);
+    const pos = await getCursorPos(page);
+    expect(pos.row).toBe(0);
+    expect(pos.col).toBe(8);
+  });
+
+  test("4-16 t buffer survives Shift keydown before target char", async ({
+    page,
+  }) => {
+    await goToLevel(page, 22);
+    await page.locator("#editor-input").focus();
+    // Press t — buffer should show pending
+    await page.keyboard.press("t");
+    await page.waitForTimeout(50);
+    let status = await getStatusBar(page);
+    expect(status).toContain("t → ?");
+    // Press and release Shift — must NOT clear the buffer
+    await page.keyboard.down("Shift");
+    await page.waitForTimeout(50);
+    status = await getStatusBar(page);
+    expect(status).toContain("t → ?");
+    await page.keyboard.up("Shift");
+    await page.waitForTimeout(50);
+    status = await getStatusBar(page);
+    expect(status).toContain("t → ?");
+    // Now press the actual character
+    await page.keyboard.press(")");
+    await page.waitForTimeout(50);
+    const pos = await getCursorPos(page);
+    expect(pos.row).toBe(0);
+    expect(pos.col).toBe(13);
+  });
+
+  test("4-17 g buffer survives modifier keys", async ({ page }) => {
+    await goToLevel(page, 20);
+    await page.locator("#editor-input").focus();
+    // Press g — buffer should show pending
+    await page.keyboard.press("g");
+    await page.waitForTimeout(50);
+    let status = await getStatusBar(page);
+    expect(status).toContain("g → ?");
+    // Press and release Shift — must NOT clear the buffer
+    await page.keyboard.down("Shift");
+    await page.waitForTimeout(50);
+    status = await getStatusBar(page);
+    expect(status).toContain("g → ?");
+    await page.keyboard.up("Shift");
+    await page.waitForTimeout(50);
+    status = await getStatusBar(page);
+    expect(status).toContain("g → ?");
+    // g prefix should still work after Shift
+    await page.keyboard.press("h");
+    await page.waitForTimeout(50);
+    const pos = await getCursorPos(page);
+    expect(pos.row).toBe(0);
+    expect(pos.col).toBe(0);
+  });
 });

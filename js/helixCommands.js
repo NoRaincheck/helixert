@@ -424,6 +424,11 @@ function executeSingle(key, e) {
 
 // --- Buffered commands (multi-key sequences) ---
 function executeBuffered(key, e) {
+  // Ignore modifier keys — they are part of producing a character (e.g. Shift+2 → @)
+  // and should not clear the pending buffer.
+  if (["Shift", "Control", "Alt", "Meta"].includes(key)) {
+    return { handled: true };
+  }
   gs.appendCommandLog(key);
   const buf = _buffer.join("");
 
