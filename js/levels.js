@@ -533,7 +533,7 @@ export const levels = [
     world: 5,
     name: "Append the Order",
     instructions:
-      'Use <kbd class="kbd">a</kbd> to append after cursor, <kbd class="kbd">A</kbd> to append at line end. Complete the sentence.',
+      'Use <kbd class="kbd">a</kbd> to append after cursor, <kbd class="kbd">A</kbd> to append at line end. Complete the sentence (hint it is 42).',
     initialContent: [
       "The answer is",
     ],
