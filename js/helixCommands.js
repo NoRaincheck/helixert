@@ -281,7 +281,7 @@ function executeSingle(key, e) {
   if (key === "o") {
     gs.pushUndo();
     const c = gs.getCursor();
-    tb.insertContentLine(c.row + 1, "");
+    gs.insertContentLine(c.row + 1, "");
     tb.moveCursor(c.row + 1, 0);
     gs.setMode("INSERT");
     gs.setUsedInsertMode(true);
@@ -292,7 +292,7 @@ function executeSingle(key, e) {
   if (key === "O") {
     gs.pushUndo();
     const c = gs.getCursor();
-    tb.insertContentLine(c.row, "");
+    gs.insertContentLine(c.row, "");
     tb.moveCursor(c.row, 0);
     gs.setMode("INSERT");
     gs.setUsedInsertMode(true);
@@ -623,7 +623,7 @@ function executeInsert(key, e) {
     const before = line.slice(0, c.col);
     const after = line.slice(c.col);
     gs.updateContentLine(c.row, before);
-    tb.insertContentLine(c.row + 1, after);
+    gs.insertContentLine(c.row + 1, after);
     tb.moveCursor(c.row + 1, 0);
     gs.clearCommandLog();
     return { handled: true };

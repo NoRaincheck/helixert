@@ -126,4 +126,15 @@ test.describe("World 5 — Insert Mode", () => {
     const content = await getEditorContent(page);
     expect(content).toEqual(["I love banannas"]);
   });
+
+  test("5-14 o inserts line and typing completes level 27", async ({ page }) => {
+    await goToLevel(page, 27);
+    await pressKeys(page, ["o"]);
+    await pressKeys(page, [
+      "n", "e", "w", " ", "l", "i", "n", "e",
+    ]);
+    await pressKeys(page, ["Escape"]);
+    const content = await getEditorContent(page);
+    expect(content).toEqual(["First line.", "new line", "Second line."]);
+  });
 });
