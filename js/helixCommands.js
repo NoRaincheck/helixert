@@ -612,6 +612,23 @@ function executeInsert(key, e) {
     return { handled: true };
   }
 
+  if (key === "Delete") {
+    const c = gs.getCursor();
+    const lineLen = tb.getLineLength(c.row);
+    if (c.col < lineLen) {
+      gs.pushUndo();
+      const line = tb.getLine(c.row);
+      gs.updateContentLine(c.row, line.slice(0, c.col) + line.slice(c.col + 1));
+    } else if (c.row < tb.getLineCount() - 1) {
+      gs.pushUndo();
+      const nextLine = tb.getLine(c.row + 1);
+      gs.updateContentLine(c.row, tb.getLine(c.row) + nextLine);
+      tb.deleteLine(c.row + 1);
+    }
+    gs.clearCommandLog();
+    return { handled: true };
+  }
+
   if (key === "Enter") {
     if (tb.getLineCount() >= 50) {
       gs.clearCommandLog();
