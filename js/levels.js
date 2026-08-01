@@ -723,8 +723,8 @@ export const levels = [
     instructions:
       'Search with <kbd class="kbd">/</kbd>, then <kbd class="kbd">n</kbd> to jump to next match. Find the second "target".',
     initialContent: [
-      "target first",
       "no match here",
+      "target first",
       "target second",
     ],
     target: { row: 2, col: 0 },
@@ -780,7 +780,7 @@ export const levels = [
     instructions:
       'Search for "foo", then press <kbd class="kbd">n</kbd> twice to reach the third occurrence.',
     initialContent: [
-      "foo bar baz",
+      "some foo here",
       "qux foo quux",
       "corge grault foo",
     ],

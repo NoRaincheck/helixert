@@ -10,6 +10,14 @@ import {
   pressKeys,
 } from "../helpers";
 
+/** The completion modal is hidden via pointer-events-none + opacity, so check the class. */
+async function isLevelComplete(page) {
+  return page.evaluate(() => {
+    const el = document.getElementById("modal");
+    return el ? !el.classList.contains("pointer-events-none") : false;
+  });
+}
+
 test.describe("World 7 — Search", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
@@ -59,8 +67,8 @@ test.describe("World 7 — Search", () => {
     await goToLevel(page, 36);
     const content = await getEditorContent(page);
     expect(content).toEqual([
-      "target first",
       "no match here",
+      "target first",
       "target second",
     ]);
   });
@@ -89,7 +97,7 @@ test.describe("World 7 — Search", () => {
     await goToLevel(page, 39);
     const content = await getEditorContent(page);
     expect(content).toEqual([
-      "foo bar baz",
+      "some foo here",
       "qux foo quux",
       "corge grault foo",
     ]);
@@ -142,5 +150,41 @@ test.describe("World 7 — Search", () => {
     await pressKeys(page, ["N"]);
     const mode = await getMode(page);
     expect(mode).toBe("NORMAL");
+  });
+
+  test("7-14 /target<Enter> wraps to the first target from the bottom", async ({
+    page,
+  }) => {
+    await goToLevel(page, 35);
+    await page.locator("#editor-input").focus();
+    await pressKeys(page, ["/", "t", "a", "r", "g", "e", "t", "Enter"]);
+    await page.waitForTimeout(700);
+    const pos = await getCursorPos(page);
+    expect(pos).toEqual({ row: 0, col: 9 });
+    expect(await isLevelComplete(page)).toBe(true);
+  });
+
+  test("7-15 /target<Enter> then n reaches the second target", async ({
+    page,
+  }) => {
+    await goToLevel(page, 36);
+    await page.locator("#editor-input").focus();
+    await pressKeys(page, ["/", "t", "a", "r", "g", "e", "t", "Enter", "n"]);
+    await page.waitForTimeout(700);
+    const pos = await getCursorPos(page);
+    expect(pos).toEqual({ row: 2, col: 0 });
+    expect(await isLevelComplete(page)).toBe(true);
+  });
+
+  test("7-16 /foo<Enter> then n twice reaches the third occurrence", async ({
+    page,
+  }) => {
+    await goToLevel(page, 39);
+    await page.locator("#editor-input").focus();
+    await pressKeys(page, ["/", "f", "o", "o", "Enter", "n", "n"]);
+    await page.waitForTimeout(700);
+    const pos = await getCursorPos(page);
+    expect(pos).toEqual({ row: 2, col: 13 });
+    expect(await isLevelComplete(page)).toBe(true);
   });
 });

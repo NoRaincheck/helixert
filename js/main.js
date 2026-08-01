@@ -171,7 +171,7 @@ function handleSearchKey(e) {
           const m = matches[i];
           if (
             m.row > cursor.row ||
-            (m.row === cursor.row && m.start >= cursor.col)
+            (m.row === cursor.row && m.start > cursor.col)
           ) {
             bestIdx = i;
             break;
@@ -183,7 +183,7 @@ function handleSearchKey(e) {
           const m = matches[i];
           if (
             m.row < cursor.row ||
-            (m.row === cursor.row && m.start <= cursor.col)
+            (m.row === cursor.row && m.start < cursor.col)
           ) {
             bestIdx = i;
             break;
