@@ -16,15 +16,20 @@ let _buffer = [];
 let _lastFindChar = null;
 let _lastFindDir = null;
 let _lastChange = null; // for dot repeat
+let _pendingOperator = null; // operator-pending mode: "c", "d", or "y"
+let _pendingInsertedText = ""; // text typed after change operator
 
 export function reset() {
   _buffer = [];
   _lastFindChar = null;
   _lastFindDir = null;
   _lastChange = null;
+  _pendingOperator = null;
+  _pendingInsertedText = "";
 }
 
 export function getBufferDisplay() {
+  if (_pendingOperator) return _pendingOperator;
   if (_buffer.length === 0) return "";
   const b = _buffer.join("");
   if (
@@ -72,12 +77,72 @@ function resetCount() {
   gs.setCountBuffer("");
 }
 
+// --- Operator-pending: apply operator after a motion ---
+function executeOperatorPendingMotion(motionFn) {
+  if (!_pendingOperator) return false;
+  const op = _pendingOperator;
+  _pendingOperator = null;
+  const count = getCount();
+  const cursor = gs.getCursor();
+
+  // Calculate the range based on the motion
+  let startRow = cursor.row;
+  let startCol = cursor.col;
+  let endRow = cursor.row;
+  let endCol = cursor.col;
+
+  if (motionFn) {
+    const result = motionFn(count);
+    endRow = result.endRow;
+    endCol = result.endCol;
+  }
+
+  // Normalize selection range
+  if (endRow < startRow || (endRow === startRow && endCol < startCol)) {
+    [startRow, endRow] = [endRow, startRow];
+    [startCol, endCol] = [endCol, startCol];
+  }
+
+  gs.setSelectStart({ row: startRow, col: startCol });
+  gs.setSelectEnd({ row: endRow, col: endCol });
+
+  // Execute the operator on the selection
+  resetCount();
+  return executeOperator(op);
+}
+
+// Find word range at position (for operator-pending cw/dw/yw)
+function getWordRangeAt(row, col) {
+  const line = tb.getLine(row);
+  if (!line || col < 0 || col >= line.length) return null;
+
+  // If on whitespace or non-word char, move forward to next word
+  if (/\s/.test(line[col]) || !/\w/.test(line[col])) {
+    const next = tb.findWordForward(row, col);
+    const range = getWordRangeAt(next.row, next.col);
+    // If still no word found, return empty range (safety)
+    if (!range) return { start: col, end: col };
+    return range;
+  }
+
+  let start = col;
+  let end = col;
+  while (start > 0 && /\w/.test(line[start - 1])) start--;
+  while (end < line.length && /\w/.test(line[end])) end++;
+  return { start, end };
+}
+
 // --- Execute a single key in NORMAL mode ---
 function executeSingle(key, e) {
   const ctrlKey = e.ctrlKey;
 
   // Escape
   if (gs.isEscapeKey(e)) {
+    if (_pendingOperator) {
+      _pendingOperator = null;
+      gs.clearCommandLog();
+      return { handled: true };
+    }
     if (gs.hasSelection()) {
       gs.clearSelection();
     }
@@ -125,6 +190,17 @@ function executeSingle(key, e) {
 
   // --- Word motions ---
   if (key === "w") {
+    if (_pendingOperator) {
+      // For operator-pending cw/dw/yw: delete/change/yank from cursor to end of word
+      return executeOperatorPendingMotion((count) => {
+        let c = { ...gs.getCursor() };
+        for (let i = 0; i < count; i++) {
+          const range = getWordRangeAt(c.row, c.col);
+          if (range) c = { row: c.row, col: range.end };
+        }
+        return { endRow: c.row, endCol: c.col };
+      });
+    }
     const count = getCount();
     for (let i = 0; i < count; i++) {
       const c = gs.getCursor();
@@ -138,6 +214,16 @@ function executeSingle(key, e) {
   }
 
   if (key === "b") {
+    if (_pendingOperator) {
+      return executeOperatorPendingMotion((count) => {
+        let c = { ...gs.getCursor() };
+        for (let i = 0; i < count; i++) {
+          const prev = tb.findWordBackward(c.row, c.col);
+          c = { ...prev };
+        }
+        return { endRow: c.row, endCol: c.col };
+      });
+    }
     const count = getCount();
     for (let i = 0; i < count; i++) {
       const c = gs.getCursor();
@@ -151,6 +237,16 @@ function executeSingle(key, e) {
   }
 
   if (key === "e") {
+    if (_pendingOperator) {
+      return executeOperatorPendingMotion((count) => {
+        let c = { ...gs.getCursor() };
+        for (let i = 0; i < count; i++) {
+          const end = tb.findWordEnd(c.row, c.col);
+          c = { ...end };
+        }
+        return { endRow: c.row, endCol: c.col };
+      });
+    }
     const count = getCount();
     for (let i = 0; i < count; i++) {
       const c = gs.getCursor();
@@ -181,6 +277,13 @@ function executeSingle(key, e) {
 
   // --- Find/Till (f/F/t/T prefix) ---
   if ("fFtT".includes(key)) {
+    if (_pendingOperator) {
+      // Store as buffered key for operator-pending
+      _buffer.push(key);
+      gs.setUsedFindChar(true);
+      gs.appendCommandLog(key);
+      return { handled: true };
+    }
     _buffer.push(key);
     gs.setUsedFindChar(true);
     gs.appendCommandLog(key);
@@ -189,6 +292,13 @@ function executeSingle(key, e) {
 
   // --- Select line (x) — Helix noun: select the whole line ---
   if (key === "x") {
+    if (_pendingOperator) {
+      return executeOperatorPendingMotion((count) => {
+        const cursor = gs.getCursor();
+        const endRow = Math.min(cursor.row + count - 1, tb.getLineCount() - 1);
+        return { endRow, endCol: tb.getLineLength(endRow) };
+      });
+    }
     const count = getCount();
     const cursor = gs.getCursor();
     gs.setSelectStart({ row: cursor.row, col: 0 });
@@ -215,10 +325,18 @@ function executeSingle(key, e) {
     return { handled: true, modeChange: "SELECT" };
   }
 
-  // --- Operators (verbs) — act on current selection ---
-  if (key === "d") return executeOperator("d");
-  if (key === "c") return executeOperator("c");
-  if (key === "y") return executeOperator("y");
+  // --- Operators (verbs) — act on current selection or enter operator-pending ---
+  if ("dcy".includes(key)) {
+    const sel = gs.getSelectionRange();
+    if (sel) {
+      // Selection exists — execute immediately (backward compat)
+      return executeOperator(key);
+    }
+    // No selection — enter operator-pending mode
+    _pendingOperator = key;
+    gs.appendCommandLog(key);
+    return { handled: true };
+  }
 
   // --- Paste after (p) ---
   if (key === "p") {
@@ -436,15 +554,32 @@ function executeBuffered(key, e) {
   if (buf === "g") {
     if (key === "g") {
       // gg — go to first line
-      tb.moveCursor(0, 0);
       _buffer = [];
+      if (_pendingOperator) {
+        const op = _pendingOperator;
+        _pendingOperator = null;
+        gs.setSelectStart({ row: 0, col: 0 });
+        gs.setSelectEnd({ row: tb.getLineCount() - 1, col: tb.getLineLength(tb.getLineCount() - 1) });
+        resetCount();
+        return executeOperator(op);
+      }
+      tb.moveCursor(0, 0);
       gs.clearCommandLog();
       return { handled: true, moved: true };
     }
     if (key === "e") {
       // ge — go to last line
-      tb.moveCursor(tb.getLineCount() - 1, 0);
       _buffer = [];
+      if (_pendingOperator) {
+        const op = _pendingOperator;
+        _pendingOperator = null;
+        const lastRow = tb.getLineCount() - 1;
+        gs.setSelectStart({ row: 0, col: 0 });
+        gs.setSelectEnd({ row: lastRow, col: tb.getLineLength(lastRow) });
+        resetCount();
+        return executeOperator(op);
+      }
+      tb.moveCursor(tb.getLineCount() - 1, 0);
       gs.clearCommandLog();
       return { handled: true, moved: true };
     }
@@ -452,18 +587,38 @@ function executeBuffered(key, e) {
       // gh — go to line start (first non-blank)
       const line = tb.getLine(gs.getCursor().row);
       const firstNonBlank = line.search(/\S/);
+      _buffer = [];
+      if (_pendingOperator) {
+        const op = _pendingOperator;
+        _pendingOperator = null;
+        const c = gs.getCursor();
+        const targetCol = firstNonBlank >= 0 ? firstNonBlank : 0;
+        gs.setSelectStart({ row: c.row, col: 0 });
+        gs.setSelectEnd({ row: c.row, col: targetCol });
+        resetCount();
+        return executeOperator(op);
+      }
       tb.moveCursor(gs.getCursor().row, firstNonBlank >= 0 ? firstNonBlank : 0);
       gs.setDesiredCol(gs.getCursor().col);
-      _buffer = [];
       gs.clearCommandLog();
       return { handled: true, moved: true };
     }
     if (key === "l") {
       // gl — go to line end
       const row = gs.getCursor().row;
+      _buffer = [];
+      if (_pendingOperator) {
+        const op = _pendingOperator;
+        _pendingOperator = null;
+        const c = gs.getCursor();
+        const targetCol = Math.max(0, tb.getLineLength(row) - 1);
+        gs.setSelectStart({ row: c.row, col: 0 });
+        gs.setSelectEnd({ row: c.row, col: targetCol });
+        resetCount();
+        return executeOperator(op);
+      }
       tb.moveCursor(row, Math.max(0, tb.getLineLength(row) - 1));
       gs.setDesiredCol(gs.getCursor().col);
-      _buffer = [];
       gs.clearCommandLog();
       return { handled: true, moved: true };
     }
@@ -492,6 +647,21 @@ function executeBuffered(key, e) {
       _buffer = [];
 
       if (result) {
+        if (_pendingOperator) {
+          // Operator-pending: apply operator from cursor to found position
+          const op = _pendingOperator;
+          _pendingOperator = null;
+          const startRow = gs.getCursor().row;
+          const startCol = gs.getCursor().col;
+          const endRow = result.row;
+          const endCol = result.col + (buf === "f" || buf === "F" ? 1 : 0);
+
+          gs.setSelectStart({ row: startRow, col: startCol });
+          gs.setSelectEnd({ row: endRow, col: endCol });
+          tb.moveCursor(result.row, result.col);
+          resetCount();
+          return executeOperator(op);
+        }
         tb.moveCursor(result.row, result.col);
         gs.clearCommandLog();
         return { handled: true, moved: true };
@@ -561,6 +731,7 @@ function executeOperator(op) {
     gs.setMode("INSERT");
     gs.setUsedInsertMode(true);
     _lastChange = { type: "change", range: sel, text: deleted };
+    _pendingInsertedText = "";
   } else if (op === "y") {
     const yanked = tb.yankRange(
       sel.startRow,
@@ -585,10 +756,15 @@ function executeOperator(op) {
 // --- INSERT mode ---
 function executeInsert(key, e) {
   if (gs.isEscapeKey(e)) {
+    // Capture inserted text for dot repeat
+    if (_lastChange && _lastChange.type === "change" && _pendingInsertedText) {
+      _lastChange.insertedText = _pendingInsertedText;
+    }
     gs.setMode("NORMAL");
     // Move cursor back one (like vim/helix)
     const c = gs.getCursor();
     if (c.col > 0) tb.moveCursorRelative(0, -1);
+    _pendingInsertedText = "";
     gs.clearCommandLog();
     return { handled: true, modeChange: "NORMAL" };
   }
@@ -700,6 +876,10 @@ function executeInsert(key, e) {
     const c = gs.getCursor();
     tb.insertText(c.row, c.col, key);
     tb.moveCursorRelative(0, 1);
+    // Accumulate inserted text for dot repeat
+    if (_lastChange && _lastChange.type === "change") {
+      _pendingInsertedText += key;
+    }
     gs.clearCommandLog();
     return { handled: true };
   }
@@ -744,8 +924,13 @@ function executeSelect(key, e) {
   // Word motions in SELECT mode
   if (key === "w") {
     const c = gs.getCursor();
-    const next = tb.findWordForward(c.row, c.col);
-    tb.moveCursor(next.row, next.col);
+    const range = getWordRangeAt(c.row, c.col);
+    if (range) {
+      tb.moveCursor(c.row, range.end);
+    } else {
+      const next = tb.findWordForward(c.row, c.col);
+      tb.moveCursor(next.row, next.col);
+    }
     gs.setSelectEnd(gs.getCursor());
     resetCount();
     gs.clearCommandLog();
@@ -836,5 +1021,41 @@ function replayChange(change) {
           line.slice(change.pos.col + 1),
       );
     }
+  } else if (change.type === "change") {
+    // Replay a change at the CURRENT cursor position.
+    // For cw/dw-style changes, find the word at current position
+    // and apply the same transformation.
+    const c = gs.getCursor();
+    const range = getWordRangeAt(c.row, c.col);
+    let startCol = c.col;
+    let endCol = c.col + 1; // fallback: single char
+    if (range) {
+      startCol = range.start;
+      endCol = range.end;
+    }
+
+    gs.setSelectStart({ row: c.row, col: startCol });
+    gs.setSelectEnd({ row: c.row, col: endCol });
+    // Save inserted text before executeOperator overwrites _lastChange
+    const savedInsertedText = change.insertedText;
+    // Delete the selection (enters INSERT mode)
+    executeOperator("c");
+    // Insert the stored text
+    if (savedInsertedText) {
+      const ic = gs.getCursor();
+      tb.insertText(ic.row, ic.col, savedInsertedText);
+      // Move cursor forward by inserted text length, then back one
+      // (simulating vim/helix Esc behavior after typing in INSERT mode)
+      const afterInsert = gs.getCursor();
+      for (let i = 0; i < savedInsertedText.length; i++) {
+        tb.moveCursorRelative(0, 1);
+      }
+      const final = gs.getCursor();
+      if (final.col > 0) tb.moveCursorRelative(0, -1);
+    }
+    // Restore _lastChange with insertedText for subsequent dot repeats
+    _lastChange = { type: "change", range: { startRow: c.row, startCol, endRow: c.row, endCol }, insertedText: savedInsertedText };
+    // Return to NORMAL mode
+    gs.setMode("NORMAL");
   }
 }

@@ -800,19 +800,19 @@ export const levels = [
     world: 8,
     name: "Dot Repeat",
     instructions:
-      'Make a change (e.g., <kbd class="kbd">r</kbd> to replace), then <kbd class="kbd">.</kbd> to repeat it. Fix all the X marks.',
+      'Use <kbd class="kbd">c</kbd><kbd class="kbd">w</kbd> to change a word, type the replacement, <kbd class="kbd">Esc</kbd>, then <kbd class="kbd">.</kbd> to repeat the change. Fix all the X marks.',
     initialContent: [
-      "X X X X X",
+      "X-X-X-X-X",
     ],
     targetContent: [
-      "O O O O O",
+      "O-O-O-O-O",
     ],
     setup: (s) => {
       s.cursor = { row: 0, col: 0 };
     },
-    commands: ["r", ".", "l"],
-    par: 8,
-    wizard: 5,
+    commands: ["c", "w", "l", "."],
+    par: 18,
+    wizard: 14,
   },
   {
     world: 8,
